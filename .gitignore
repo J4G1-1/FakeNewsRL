@@ -10,6 +10,7 @@ FakeNews_env/
 lab/
 .vscode/
 .gitignore
+api.txt
 
 # Distribution / packaging
 .Python
