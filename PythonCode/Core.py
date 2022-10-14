@@ -22,7 +22,14 @@ if not os.path.exists(logcustom):
     os.makedirs(logcustom)
 
 #Creacion del ambiente
-env = FakeNewsEnv()
+# 0: Similitud al insertar
+# 1: Longitud de sent insertado
+# 2: Descision diff
+# 3: Reward por repetir step
+# 4: Reward por el tamaño de cada lista
+
+flags = "00100"
+env = FakeNewsEnv(flags)
 
 ##Estos timesteps serán el número de pasos de una evaluación
 ##para hacer un reporte en tensorboard
@@ -44,9 +51,8 @@ now = datetime.now() # current date and time
 date_time = now.strftime("%m %d %Y, %H:%M:%S")
 
 #COmenzar el entrenamiento del modelo 
-model.learn(total_timesteps=TIMESTEPS, tb_log_name="PPO")
+model.learn(total_timesteps=TIMESTEPS, tb_log_name=f'PPO - {date_time} - {flags}')
 
 #Guardar el checkpoint del modelo
 print("saving the model...")
 model.save(f"{models_dir}/brain - {date_time}")
-

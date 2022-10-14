@@ -8,6 +8,7 @@ import pandas as pd
 
 import spacy
 from scipy import stats
+from math import e
 
 import os
 
@@ -21,13 +22,14 @@ class FakeNewsEnv(gym.Env):
   """Custom Environment that follows gym interface"""
   metadata = {'render.modes': ['human']}
 
-  def __init__(self):
+  def __init__(self,flags):
     super(FakeNewsEnv, self).__init__()
     # Define action and observation space
     # They must be gym.spaces objects
     # Example when using discrete actions:
 
     self.action_counter=[0,0,0,0]
+    self.flags = flags
 
     #Crear carpetas de logs escritos por el programador
     logcustom = "logscustom"
@@ -78,6 +80,9 @@ class FakeNewsEnv(gym.Env):
         self.GaussianFactorList.append(number)
       else:
         break
+  
+  def sigmodialFunction(self,value, factor, estrecho, desx, desy):
+    return factor/(1+pow(e+estrecho,-(value-desx))) + desy
     
   def GetSents(self,text):
     try:
@@ -120,12 +125,20 @@ class FakeNewsEnv(gym.Env):
     
     return reward
 
+
   def step(self, action):
 
     self.action_counter[action] = self.action_counter[action] + 1
 
     isFinished = False
     reward = 0
+
+    rew_simility = 0
+    rew_len = 0
+    reward_factor = 0
+    reward_diff_step = 0
+    reward_len_agree = 0
+    reward_len_disagree = 0
 
     ##Ignore sent
     if action==0:
@@ -135,7 +148,7 @@ class FakeNewsEnv(gym.Env):
       if more is False:
         reward = -0.5
       else:
-        reward = 0.3
+        reward = 0.4
 
 
     ##Add to affirm
@@ -147,12 +160,20 @@ class FakeNewsEnv(gym.Env):
       if more is False:
         reward = -0.1
       else:
-        simility_list = self.argumentLists.append_agree_list(present_sent)
-        self.SimilarityReward(simility_list)
+        ##Calculo de similitud
+        if self.flags[0] == '1':
+          simility_list = self.argumentLists.append_agree_list(present_sent)
+          rew_simility = self.SimilarityReward(simility_list)
+
+        ##Calculo de longitud
+        if self.flags[1] == '1':
+          rew_len = self.sigmodialFunction(len(present_sent),7,-1.3,13,-3.5)
+
+        reward = reward + rew_len + rew_simility
 
     ##Add to objection
     if action==2:
-
+      ##Calculo de similitud
       present_sent = self.argumentLists.GetCurrentSent()
 
       more = self.argumentLists.GoToNextSent()
@@ -160,9 +181,16 @@ class FakeNewsEnv(gym.Env):
       if more is False:
         reward = -0.1
       else:
+        ##Calculo de similitud
+        if self.flags[0] == '1':
+          simility_list = self.argumentLists.append_disagree_list(present_sent)
+          rew_simility = self.SimilarityReward(simility_list)
 
-        simility_list = self.argumentLists.append_disagree_list(present_sent)
-        self.SimilarityReward(simility_list)
+        ##Calculo de longitud
+        if self.flags[1] == '1':
+          rew_len = self.sigmodialFunction(len(present_sent),7,-1.3,13,-3.5)
+
+        reward = reward + rew_len + rew_simility
 
 
     ##Go to the next url
@@ -170,35 +198,53 @@ class FakeNewsEnv(gym.Env):
 
       status = self.webScrapper.GotoNextWebPage()
 
-      decision = self.argumentLists.GetDecision()
+      if self.flags[2] == '1':
+        decision = self.argumentLists.GetDecision()
+        agreelist = self.argumentLists.getAgreeList()
+        disagreelist = self.argumentLists.getDisagreeList()
 
-      agreelist = self.argumentLists.getAgreeList()
-      disagreelist = self.argumentLists.getDisagreeList()
+        diff = abs(len(agreelist) - len(disagreelist))
+        
+        #Difference in list reward
+        reward_factor = self.sigmodialFunction(diff,3.4,-0.5,4.4,0)
 
-      diff = abs(len(agreelist) - len(disagreelist))
-      
-      reward_factor = pow(diff,2)/3
+        if not status:
 
-      if not status:
+          if decision == -1:
+            reward = 0 + reward
+          elif self.label == decision:
+            reward = reward_factor + reward
+          else:
+            reward = -reward_factor + reward
 
-        if decision == -1:
-          reward = 0
-        elif self.label == decision:
-          reward = reward_factor
+          isFinished = True
+        
         else:
-          reward = -reward_factor
+          reward_factor = 0.05*reward_factor
+          if decision == -1:
+            reward = 0 + reward
+          elif self.label == decision:
+            reward =  reward_factor+ reward
+          else:
+            reward = -reward_factor + reward
 
-        isFinished = True
-      
-      else:
+      #Reward de pasos
+      if self.flags[3] == '1':
+        current_step_num = sum(self.action_counter)
+        diff_step = current_step_num - self.last_step_three
 
-        if decision == -1:
-          reward = 0
-        elif self.label == decision:
-          reward = 0.1*reward_factor
-        else:
-          reward = -0.1*reward_factor
-    
+        reward_diff_step = self.sigmodialFunction(diff_step,19.2,-1.4,24.5,-11.3)
+        reward = reward_diff_step + reward
+
+        self.last_step_three = current_step_num
+
+      #Reward de tamaño
+      if self.flags[4] == '1':
+        reward_len_agree = self.sigmodialFunction(len(agreelist),4.5,-0.6,4,-2)
+        reward_len_disagree = self.sigmodialFunction(len(disagreelist),4.5,-0.6,4,-2)
+
+      reward = reward_len_agree + reward_len_disagree + reward
+
     observation = self.BuildObservation()
 
     info = {}
@@ -206,10 +252,17 @@ class FakeNewsEnv(gym.Env):
     self.total_reward = self.total_reward + reward
 
     log = f'-------------------------------------------------- \n' + \
+          f'flags: {self.flags} \n' + \
           f'Action counter:  {self.action_counter} \n' + \
           f'Action: {action} \n' + \
-          f'Current sent: {self.argumentLists.GetCurrentSent()} \n' + \
+          f'rew_simility: {rew_simility} \n' + \
+          f'rew_len: {rew_len} \n' + \
+          f'reward_factor: {reward_factor} \n' + \
+          f'reward_diff_step: {reward_diff_step} \n' + \
+          f'reward_len_agree: {reward_len_agree} \n' + \
+          f'reward_len_disagree: {reward_len_disagree} \n' + \
           f'Reward: {reward}, Total: {self.total_reward} \n' + \
+          f'Current sent: {self.argumentLists.GetCurrentSent()} \n' + \
           f'Agree list: \n' + \
           f'{self.argumentLists.getAgreeList()} \n' + \
           f'Disagree list \n' + \
@@ -221,6 +274,8 @@ class FakeNewsEnv(gym.Env):
 
 
   def reset(self):
+
+    self.last_step_three = sum(self.action_counter)
 
     print("Reinicio")
 
@@ -246,7 +301,7 @@ class FakeNewsEnv(gym.Env):
         elif status == 1:
           break
 
-      html = self.webScrapper.GetLoadedHTML()
+      html = self.webScrapper.GetLoadedData()
       sents = self.GetSents(html)
       if len(sents)>0:
         break        

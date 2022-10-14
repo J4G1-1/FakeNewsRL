@@ -35,7 +35,7 @@ class WebScrapper:
     #Si la página tarda más de 5 segundos, se extrae el html como éste y se sigue
     self.driver.set_page_load_timeout(5)
 
-    self.html_text = ''
+    self.data = ''
 
   #El método busca en internet el string phrase y guarda los url devueltos.
   #TODO: El méotodo actualmente usa duckduck, sin embargo con la estrucutra
@@ -124,7 +124,7 @@ class WebScrapper:
       html_text = re.sub('\n', '.', html_text)
       html_text = re.sub('\s{2,}', '.', html_text)
       html_text = re.sub('\[\d+]', '', html_text)
-      self.html_text = re.sub('\|+|\/+|-+', '\n', html_text)
+      self.data = re.sub('\|+|\/+|-+', '\n', html_text)
 
       return 1
 
@@ -132,5 +132,8 @@ class WebScrapper:
       return -1
 
   #Getter del texto obtenido del html de la última pagina cargada exitosamente.
-  def GetLoadedHTML(self):
-    return self.html_text
+  def GetLoadedData(self):
+    return self.data
+
+  def Terminar(self):
+    self.driver.quit()
