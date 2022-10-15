@@ -13,17 +13,6 @@ chunkList = []
 #Carga de spacy para sent analysis y embeddings
 nlp = spacy.load("en_core_web_md")
 
-with open("chunk_300-600", "rb") as fp:   # Unpickling
-   b1 = pickle.load(fp)
-
-with open("chunk_0-300", "rb") as fp:   # Unpickling
-   b2 = pickle.load(fp)
-
-b3 = b2 + b1
-
-with open(f'chunk_0-600', "wb") as fp:   #Pickling
-   pickle.dump(b3, fp)
-
 class thread_news(threading.Thread):
     
     def __init__(self, thread_name, thread_ID, dataFrameNews,begin, end, nlp):

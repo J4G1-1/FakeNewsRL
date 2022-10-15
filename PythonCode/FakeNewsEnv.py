@@ -11,6 +11,8 @@ from scipy import stats
 from math import e
 
 import os
+from LocalDataManager import LocalDataManager
+from WebDataManager import WebDataManager
 
 from WebScrapper import WebScrapper
 from ArgumentList import ArgumentList
@@ -22,7 +24,7 @@ class FakeNewsEnv(gym.Env):
   """Custom Environment that follows gym interface"""
   metadata = {'render.modes': ['human']}
 
-  def __init__(self,flags):
+  def __init__(self,flags, train_mode = False):
     super(FakeNewsEnv, self).__init__()
     # Define action and observation space
     # They must be gym.spaces objects
@@ -56,11 +58,13 @@ class FakeNewsEnv(gym.Env):
     self.nlp = spacy.load("en_core_web_md")
 
     #Creacion del dirver para webscrapping
-    self.webScrapper = WebScrapper()
+    if train_mode:
+      self.dataManager = LocalDataManager(localdata_path='/home/serapf/Desktop/github/FakeNewsRL/chunk_0-600')
+    else:
+      self.dataManager = WebDataManager(r"/home/serapf/Desktop/FakeNewsRL/PythonCode/data/DataFakeNews.csv")
+
     #Creacion de la estrucutra de datos de listas
     self.argumentLists = ArgumentList(self.nlp)
-    #Carga de dataset para fakenews
-    self.dataFrameNews = pd.read_csv(r"/home/serapf/Desktop/FakeNewsRL/PythonCode/data/DataFakeNews.csv")
     
     #Contabilizar el total_reward
     self.total_reward = 0
@@ -196,7 +200,10 @@ class FakeNewsEnv(gym.Env):
     ##Go to the next url
     if action==3:
 
-      status = self.webScrapper.GotoNextWebPage()
+      status = self.dataManager.GoNextArticle()
+
+      if not status:
+        isFinished = True
 
       if self.flags[2] == '1':
         decision = self.argumentLists.GetDecision()
@@ -216,8 +223,6 @@ class FakeNewsEnv(gym.Env):
             reward = reward_factor + reward
           else:
             reward = -reward_factor + reward
-
-          isFinished = True
         
         else:
           reward_factor = 0.05*reward_factor
@@ -279,13 +284,8 @@ class FakeNewsEnv(gym.Env):
 
     print("Reinicio")
 
-    #Se busca el encabezado de una notica cualquiera
-    randomSample = self.dataFrameNews.sample()
-    title = randomSample["title"].iloc[0]
-    self.label = randomSample["label"].iloc[0]
-
     #Buscar en la web el termino del titulo
-    status = self.webScrapper.ChargeFromWeb(title)
+    status = self.dataManager.ChargeNewFromFile()
 
     #Si no encuentra ningun resultado reinicia
     if not status:
@@ -295,14 +295,14 @@ class FakeNewsEnv(gym.Env):
     while True:
       #Loop que revisa si se cargo y se extrajo un html exitosamente
       while True:
-        status = self.webScrapper.GotoNextWebPage()
+        status = self.dataManager.GoNextArticle()
         if status == 0:
           return self.reset()
         elif status == 1:
           break
 
-      html = self.webScrapper.GetLoadedData()
-      sents = self.GetSents(html)
+      title, self.label, text = self.dataManager.GetLoadedData()
+      sents = self.GetSents(text)
       if len(sents)>0:
         break        
 

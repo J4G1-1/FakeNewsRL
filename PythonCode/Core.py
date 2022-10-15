@@ -28,8 +28,8 @@ if not os.path.exists(logcustom):
 # 3: Reward por repetir step
 # 4: Reward por el tamaño de cada lista
 
-flags = "00100"
-env = FakeNewsEnv(flags)
+flags = "11111"
+env = FakeNewsEnv(flags,True)
 
 ##Estos timesteps serán el número de pasos de una evaluación
 ##para hacer un reporte en tensorboard
