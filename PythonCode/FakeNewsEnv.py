@@ -24,7 +24,7 @@ class FakeNewsEnv(gym.Env):
   """Custom Environment that follows gym interface"""
   metadata = {'render.modes': ['human']}
 
-  def __init__(self,flags, train_mode = False):
+  def __init__(self,flags, train_mode = False, model_name = ''):
     super(FakeNewsEnv, self).__init__()
     # Define action and observation space
     # They must be gym.spaces objects
@@ -32,6 +32,7 @@ class FakeNewsEnv(gym.Env):
 
     self.action_counter=[0,0,0,0]
     self.flags = flags
+    self.model_name = model_name
 
     #Crear carpetas de logs escritos por el programador
     logcustom = "logscustom"
@@ -84,6 +85,9 @@ class FakeNewsEnv(gym.Env):
         self.GaussianFactorList.append(number)
       else:
         break
+    
+    self.counter_good = 0
+    self.counter_wrong = 0
   
   def sigmodialFunction(self,value, factor, estrecho, desx, desy):
     return factor/(1+pow(e+estrecho,-(value-desx))) + desy
@@ -150,7 +154,7 @@ class FakeNewsEnv(gym.Env):
       more = self.argumentLists.GoToNextSent()
 
       if more is False:
-        reward = -0.5
+        reward = -0.7
       else:
         reward = 0.4
 
@@ -162,7 +166,7 @@ class FakeNewsEnv(gym.Env):
       more = self.argumentLists.GoToNextSent()
       #Si ya no hay sents se da una rencompensa negativa
       if more is False:
-        reward = -0.1
+        reward = -0.7
       else:
         ##Calculo de similitud
         if self.flags[0] == '1':
@@ -183,7 +187,7 @@ class FakeNewsEnv(gym.Env):
       more = self.argumentLists.GoToNextSent()
       #Si ya no hay sents se da una rencompensa negativa
       if more is False:
-        reward = -0.1
+        reward = -0.7
       else:
         ##Calculo de similitud
         if self.flags[0] == '1':
@@ -220,8 +224,10 @@ class FakeNewsEnv(gym.Env):
           if decision == -1:
             reward = 0 + reward
           elif self.label == decision:
+            self.counter_good = self.counter_good + 1
             reward = reward_factor + reward
           else:
+            self.counter_wrong = self.counter_wrong + 1
             reward = -reward_factor + reward
         
         else:
@@ -257,9 +263,12 @@ class FakeNewsEnv(gym.Env):
     self.total_reward = self.total_reward + reward
 
     log = f'-------------------------------------------------- \n' + \
+          f'model_name: {self.model_name} \n' + \
           f'flags: {self.flags} \n' + \
           f'Action counter:  {self.action_counter} \n' + \
           f'Action: {action} \n' + \
+          f'Good: {self.counter_good} \n' + \
+          f'Wrong: {self.counter_wrong} \n' + \
           f'rew_simility: {rew_simility} \n' + \
           f'rew_len: {rew_len} \n' + \
           f'reward_factor: {reward_factor} \n' + \
