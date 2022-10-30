@@ -1,0 +1,19 @@
+-------------------------------------------------- 
+model_name: PPO 
+flags: 10100 
+Action counter:  [380830, 51392, 98968, 19722] 
+Action: 0 
+Good: 821 
+Wrong: 1212 
+rew_simility: 0 
+rew_len: 0 
+reward_factor: 0 
+reward_diff_step: 0 
+reward_len_agree: 0 
+reward_len_disagree: 0 
+Reward: -0.0, Total: 15303.72511464723 
+Current sent: . 
+Agree list: 
+[' White Men Threw Eggs, Shouted Racial Slurs At Black Woman Waiting For Bus\n'] 
+Disagree list 
+[] 

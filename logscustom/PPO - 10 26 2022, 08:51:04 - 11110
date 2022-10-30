@@ -1,0 +1,19 @@
+-------------------------------------------------- 
+model_name: PPO 
+flags: 11110 
+Action counter:  [369969, 59824, 104230, 16889] 
+Action: 0 
+Good: 861 
+Wrong: 915 
+rew_simility: 0 
+rew_len: 0 
+reward_factor: 0 
+reward_diff_step: 0 
+reward_len_agree: 0 
+reward_len_disagree: 0 
+Reward: 0.0, Total: -143317.50833617887 
+Current sent: Watch Women Shame Men Who Pee 
+Agree list: 
+['POLICE REFUSED To Believe German Man’s Emergency Call Saying Girlfriend Was Being Raped By Refugee With Machete While Camping\n', 'POLICE REFUSED To Believe German Man’s Emergency Call\n', 'Saying Girlfriend Was Being Raped By Refugee With Machete While Camping.Stella14WMay.\n', 'Martes, Mayo 30, 2017.POLICE REFUSED To Believe German Man’s Emergency Call\n', 'Saying Girlfriend Was Being Raped By Refugee With Machete While Camping.\n', 'Mas Bagong Post.\n', 'Getpocket.\n', 'Diigo.App.net.\n', 'Deliciou.\n', '(2529)\n', '(508)\n', 'Arcade Fire in guerrilla campaign for new album.\n', 'Lebanese group trying to ban Wonder Woman.\n', "In Special Elections Since Trump Bec....Russia reportedly believed it could 'influence the....\n", "Donakd Trump's bixarre twewt mocked on Twit.‘Just\n", 'Don’t’: Twitter Goes Off on Kathy Griffin Ov....Sanjay Dutt quits film ‘Total Dhamal’ due to its ‘....Russian Agents Reportedly Bragged About Having ‘De....Speaker of the House of Trump.\n', 'Finally Hear\n', 'Driving Through the Airport.\n', "Stop, hey, what's that sound?.Daily Deal: BioShock: The Collection is 58% Off On....\n", "Ariana Grande's Mom Joan Tweets\n", 'Trump Honors Fallen Warriors At Arlington National....\n', 'GoNNER slated for June 8th release in Europe as well.\n', "Chastain 'disturbed' by Cannes' portrayal of women.\n", 'John McCain Calls Vladimir Putin And Russia A Bigg....‘Oh, a bloody shark’: Great white shark leaps into....\n'] 
+Disagree list 
+['Folkd.\n', 'The most popular cars in Europe – by country.\n'] 

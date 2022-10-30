@@ -1,0 +1,20 @@
+-------------------------------------------------- 
+model_name: DQN 
+flags: 11100 
+Action counter:  [187145, 151228, 170362, 41265] 
+Action: 1 
+Good: 2035 
+Wrong: 2141 
+rew_simility: 0 
+rew_len: 0 
+reward_factor: 0 
+reward_diff_step: 0 
+reward_len_agree: 0 
+reward_len_disagree: 0 
+Reward: -0.0, Total: 149287.45878104074 
+Current sent: .U.S. Has Interfered in Foreign Elections Multiple Times 
+ The New American. 
+Agree list: 
+['PROOF That Obama Interfered TWICE In Foreign Elections, Including Time He Used U.S. TAXPAYER MONEY To Defeat Conservative Israeli Leader [VIDEO]\n'] 
+Disagree list 
+[] 

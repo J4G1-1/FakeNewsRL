@@ -1,0 +1,19 @@
+-------------------------------------------------- 
+model_name: DQN 
+flags: 00101 
+Action counter:  [132032, 189337, 193051, 35580] 
+Action: 1 
+Good: 1786 
+Wrong: 1676 
+rew_simility: 0 
+rew_len: 0 
+reward_factor: 0 
+reward_diff_step: 0 
+reward_len_agree: 0 
+reward_len_disagree: 0 
+Reward: 0, Total: 45417.21118063688 
+Current sent: Last LaughCULTUREPower TripFashionBooksRoyalistTECHDisinformationSCOUTEDClothingTechnologyBeautyHomePetsKitchenFitnessI'm Looking ForBEST PICKSBest VPNsBest Gaming PCsBest Air FryersCOUPONSVistaprint CouponsUlta CouponsOffice Depot CouponsAdidas Promo CodesWalmart Promo CodesH&M CouponsSpanx Promo CodesStubHub Promo CodesProductsNewslettersPodcastsCrosswordsSubscriptionFOLLOW USGOT A TIP?SEARCHHOMEPAGEEntertainmentMelissa McCarthy’s Sean Spicer Addresses Hitler Comments on SNLSHE HAS RISENAs expected, Melissa McCarthy’s Sean Spicer returned to ‘Saturday Night Live’ this week—as the Easter Bunny. 
+Agree list: 
+[' Melissa McCarthy Just Took On Sean Spicer’s ‘Hitler Moment’ And It’s F*cking Perfect (VIDEO)\n', 'Melissa McCarthy’s Sean Spicer Addresses Hitler Comments on SNL.CrosswordNewslettersALLCheat\n', 'SheetObsessedPoliticsCrimeEntertainmentMediaInnovationOpinionWorldU.S.\n', 'NewsScoutedCHEAT SHEETPOLITICSFever DreamsBiden WorldElectionsOpinionNational SecurityCongressPay DirtThe New AbnormalRight RichterTrumplandMEDIAConfiderDaytime\n', 'TalkLate\nNightFox NewsU.S. NEWSIdentitiesCrimeRaceLGBTExtremismCoronavirusWORLDRussiaEuropeChinaMiddle EastINNOVATIONScienceTRAVELENTERTAINMENTTVMoviesMusicComedySportsSexTDBs\n', 'ObsessedAwards ShowsThe\n'] 
+Disagree list 
+[] 

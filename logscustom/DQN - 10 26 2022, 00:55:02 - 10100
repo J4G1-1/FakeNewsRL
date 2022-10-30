@@ -1,0 +1,20 @@
+-------------------------------------------------- 
+model_name: DQN 
+flags: 10100 
+Action counter:  [189413, 157177, 166457, 36953] 
+Action: 0 
+Good: 1758 
+Wrong: 2029 
+rew_simility: 0 
+rew_len: 0 
+reward_factor: 0 
+reward_diff_step: 0 
+reward_len_agree: 0 
+reward_len_disagree: 0 
+Reward: -0.0, Total: 153242.11413719566 
+Current sent: .Thomas: Make ‘Good Guys With Assault Rifles’ Pay for Those Who Are Killed With Their Guns 
+ The Truth About Guns. 
+Agree list: 
+[' Orlando Police: Good Guys With Guns Might Have Killed Some Of The Victims\n'] 
+Disagree list 
+[] 

@@ -1,0 +1,20 @@
+-------------------------------------------------- 
+model_name: PPO 
+flags: 11100 
+Action counter:  [23257, 470982, 36659, 20014] 
+Action: 1 
+Good: 877 
+Wrong: 1174 
+rew_simility: 0 
+rew_len: 0 
+reward_factor: 0 
+reward_diff_step: 0 
+reward_len_agree: 0 
+reward_len_disagree: 0 
+Reward: -0.0, Total: 5161.458381518114 
+Current sent: .U.S. Has Interfered in Foreign Elections Multiple Times 
+ The New American. 
+Agree list: 
+['PROOF That Obama Interfered TWICE In Foreign Elections, Including Time He Used U.S. TAXPAYER MONEY To Defeat Conservative Israeli Leader [VIDEO]\n'] 
+Disagree list 
+[] 

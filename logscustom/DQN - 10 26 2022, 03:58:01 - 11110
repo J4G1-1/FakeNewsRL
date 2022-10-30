@@ -1,0 +1,19 @@
+-------------------------------------------------- 
+model_name: DQN 
+flags: 11110 
+Action counter:  [234889, 136097, 158499, 20515] 
+Action: 2 
+Good: 1108 
+Wrong: 1007 
+rew_simility: 0 
+rew_len: 0 
+reward_factor: 0 
+reward_diff_step: 0 
+reward_len_agree: 0 
+reward_len_disagree: 0 
+Reward: -0.0, Total: -39684.22808835235 
+Current sent: Read MoreEditorial StandardsPrintReprints & Permissions 
+Agree list: 
+['TEXAS GOVERNOR FOR VP! Abbott Pushes Back On Obama’s Agenda Like No One Else [Video]\n', '6 Committee: Lawmakers Subpoena Trump\n', 'Joe Biden has lambasted Abbott and Mississippi Gov. Tate Reeves for scrapping social distancing and mask\nwearing orders against the recommendations of the Centers for Disease Control, calling it “neanderthal thinking.”.\n'] 
+Disagree list 
+['All Innovation5GAIBig DataCloudCloud 100COP26Consumer TechCybersecurityEnterprise TechFuture\n', "Under 30 2022American Heart Association BrandVoice \n Paid ProgramAmerica's Top Wealth AdvisorsAWS Transformation\n", 'BrandVoice \n Paid ProgramBlack Is Tech Conference 2022BlueJeans by Verizon BrandVoice \n Paid ProgramDNA of Success EY BrandVoice \n Paid ProgramForbes Insights with Adobe \n Paid ProgramForbes Insights with American Express \n Paid ProgramForbes Insights with Cloudera \n Paid ProgramHow To Earn Cash Rewards For Everyday Spending \n Paid ProgramOffice Depot OfficeMax BrandVoice \n Paid ProgramRedefining The Future Of Power:\n', 'In Tech: PyCon U.S. 2022Snowflake Summit 2022Tech Trailblazers: The Women Disrupting Disruptive Industries \n Paid ProgramThe Forbes 400 2022The Forbes CEO Next List: 2022Top Creators 2022Advertise with ForbesReport a Security IssueSite FeedbackContact UsCareers at ForbesTipsCorrectionsPrivacyDo Not Sell My Personal InformationTermsAdChoicesReprints & Permissions© 2022 Forbes Media LLC.\n', 'You may opt\nout by\xa0clicking hereBreaking13 hours agoIndiana Supreme Court Keeps Abortion Ban Blocked—Here’s Where State Lawsuits Stand Now13 hours agoSocial Security Benefits To Jump 8.7% In 2023, As Top Tax Hits $19,86513 hours agoInflation Spiked 8.2% In September In ‘Nightmare Scenario’ For Fed1 hour agoElon\n', 'Musk ‘Presently’ Under Federal Investigation Over Twitter Deal, Company Alleges4 hours agoDeSantis’ Martha’s Vineyard Flights Could Backfire: Migrants May Be Eligible For Crime Victim Visas6 hours ago‘A\n', 'Head\nScratcher’: Dow Posts Best Day Of 2022\n', 'In Final Hearing7 hours ago‘Deliberate Act’: Police Officers Killed After Fake 911 Call Lured Them Into Ambush, Cops Say7 hours agoElection Denier And Proud Boy Supporter Is Now An Election Worker\n', 'In Michigan7 hours agoSupreme Court Rules Against Trump On Mar\nA\nLago Classified DocumentsEdit StoryBreakingBusinessWhite House Pushes Back Against Texas Gov. Greg Abbott As He Blames Immigrants For Covid\n19 SpreadGina\n', 'The comments came as the Republican governor faced growing backlash for his decision to rescind statewide coronavirus restrictions, including a mask policy, and open businesses “at 100%” next week.\xa0.President\n', 'Continue watching..\n'] 

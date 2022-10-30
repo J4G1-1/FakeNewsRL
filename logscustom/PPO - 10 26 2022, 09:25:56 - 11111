@@ -1,0 +1,19 @@
+-------------------------------------------------- 
+model_name: PPO 
+flags: 11111 
+Action counter:  [350745, 67668, 110728, 21771] 
+Action: 0 
+Good: 1066 
+Wrong: 1227 
+rew_simility: 0 
+rew_len: 0 
+reward_factor: 0 
+reward_diff_step: 0 
+reward_len_agree: 0 
+reward_len_disagree: 0 
+Reward: -0.0, Total: -211742.7817746063 
+Current sent: Try saying. 
+Agree list: 
+['Indonesian parliament speaker quits amid graft investigation\n'] 
+Disagree list 
+['Search query.\n', 'Sign in.\n', 'Mail Sign in to view your mail.\n', 'Health.\n', 'Science.\n', 'Originals.\n', 'The 360The 360 Skullduggery PodcastSkullduggery Podcast ConspiracylandConspiracyland.\n', "The speaker of Indonesia's parliament, who is being investigated for his suspected involvement in a $170 million graft scandal, has tendered his resignation, two members of the assembly said on Monday.\n", "A replacement for him as speaker was expected to be decided by his party, Golkar, at an extraordinary meeting on Dec. 19, said Dito Ganinduto, a member of parliament from Novanto's Golkar party.\n", 'His latest battle with the graft agency has gripped Indonesia, where newspapers have splashed the story on front pages and social media posts mocking him have been widely shared.\n', "The Know by YahooNews anchors freeze after ‘inappropriate’ moment: ‘Jessica, we are live’Sportscaster Jessica Kaimu didn't know the world was watching when she reacted to the news anchor like this.12h agoKansas City StarHole\nin\none prize winner sues after country club refuses to give him keys to new truck“This is about doing what is right,” an attorney stated.7h ago Ad•HousingloverWhy\n", "Thursday's disclosure of internal Secret Service communications is not the first time the agency has pulled back the curtain on a president's conduct.5h agoHuffPostMarjorie Taylor Greene Ripped For Ludicrous Defense Of Alex JonesGreene stood up for her fellow conspiracy theorist after a jury ordered Jones to pay $965 million for spreading lies about the Sandy Hook school massacre.15h ago Ad•SoGoodlyWhy this Ad?I like this adI don't like this adGo ad\nfree*AdAlways Put A Crayon In Your Wallet When TravelingI was all set for my trip, or so I thought.\n", 'The reason is quite clever.\n', 'agoRaleigh News and ObserverHundreds of squishy creatures wash ashore on Outer Banks island.\n', 'min readYahoo NewsPence support for election deniers raises question of where GOP stands on 2020 liesYahoo\n', 'News·4 min readYahoo NewsA member of the 9\n11 Commission explains what the Jan. 6 committee should do nextYahoo\n', 'Waiting for permission.\n'] 

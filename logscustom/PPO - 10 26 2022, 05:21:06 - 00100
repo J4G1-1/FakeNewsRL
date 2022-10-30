@@ -1,0 +1,20 @@
+-------------------------------------------------- 
+model_name: PPO 
+flags: 00100 
+Action counter:  [14488, 47031, 477820, 11573] 
+Action: 2 
+Good: 792 
+Wrong: 420 
+rew_simility: 0 
+rew_len: 0 
+reward_factor: 0 
+reward_diff_step: 0 
+reward_len_agree: 0 
+reward_len_disagree: 0 
+Reward: -0.0, Total: 1658.1596475868166 
+Current sent: .Lil Wayne Remembers White Cop Saving His Life: 'I Don’t Know What Racism Is' 
+ XXL. 
+Agree list: 
+['THE VIDEO LIBERALS Don’t Want You To See: LIL WAYNE Tells How A White Cop Saved His Life…”I Don’t Know What Racism Is”\n'] 
+Disagree list 
+[] 

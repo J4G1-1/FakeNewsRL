@@ -35,15 +35,18 @@ class FakeNewsEnv(gym.Env):
     self.model_name = model_name
 
     #Crear carpetas de logs escritos por el programador
-    logcustom = "logscustom"
-    if not os.path.exists(logcustom):
-      os.makedirs(logcustom)
+    self.logcustom = "logscustom"
+    if not os.path.exists(self.logcustom):
+      os.makedirs(self.logcustom)
+    
+    self.log = ''
 
     #Actions
-    #0.El agente tiene 4 acciones:
-    #1.Ignorar la sent actual
-    #2.Agregar el sent a la lista de agree
-    #3.Agregar el sent a la lista de disagree
+    #El agente tiene 4 acciones:
+    #0.Ignorar la sent actual
+    #1.Agregar el sent a la lista de agree
+    #2.Agregar el sent a la lista de disagree
+    #3. Ir a la siguiente fuente de informacion
     self.action_space = spaces.Discrete(4)
 
     #Definiendo el espacio de 
@@ -88,6 +91,11 @@ class FakeNewsEnv(gym.Env):
     
     self.counter_good = 0
     self.counter_wrong = 0
+  
+  def WriteCurrentLog(self,logname):
+    f = open(f'{self.logcustom}/{logname}', "a")
+    f.write(self.log)
+    f.close()
   
   def sigmodialFunction(self,value, factor, estrecho, desx, desy):
     return factor/(1+pow(e+estrecho,-(value-desx))) + desy
@@ -154,9 +162,9 @@ class FakeNewsEnv(gym.Env):
       more = self.argumentLists.GoToNextSent()
 
       if more is False:
-        reward = -0.7
+        reward = -0.0
       else:
-        reward = 0.4
+        reward = 0.0
 
 
     ##Add to affirm
@@ -166,11 +174,13 @@ class FakeNewsEnv(gym.Env):
       more = self.argumentLists.GoToNextSent()
       #Si ya no hay sents se da una rencompensa negativa
       if more is False:
-        reward = -0.7
+        reward = -0.0
       else:
+
+        simility_list = self.argumentLists.append_agree_list(present_sent)
+
         ##Calculo de similitud
         if self.flags[0] == '1':
-          simility_list = self.argumentLists.append_agree_list(present_sent)
           rew_simility = self.SimilarityReward(simility_list)
 
         ##Calculo de longitud
@@ -187,11 +197,12 @@ class FakeNewsEnv(gym.Env):
       more = self.argumentLists.GoToNextSent()
       #Si ya no hay sents se da una rencompensa negativa
       if more is False:
-        reward = -0.7
+        reward = -0.0
       else:
+        
+        simility_list = self.argumentLists.append_disagree_list(present_sent)
         ##Calculo de similitud
         if self.flags[0] == '1':
-          simility_list = self.argumentLists.append_disagree_list(present_sent)
           rew_simility = self.SimilarityReward(simility_list)
 
         ##Calculo de longitud
@@ -262,7 +273,7 @@ class FakeNewsEnv(gym.Env):
 
     self.total_reward = self.total_reward + reward
 
-    log = f'-------------------------------------------------- \n' + \
+    self.log = f'-------------------------------------------------- \n' + \
           f'model_name: {self.model_name} \n' + \
           f'flags: {self.flags} \n' + \
           f'Action counter:  {self.action_counter} \n' + \
@@ -282,7 +293,7 @@ class FakeNewsEnv(gym.Env):
           f'Disagree list \n' + \
           f'{self.argumentLists.getDisagreeList()} \n'
 
-    print(log)
+    print(self.log)
 
     return observation, reward, isFinished, info
 

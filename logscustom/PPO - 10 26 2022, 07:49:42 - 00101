@@ -1,0 +1,20 @@
+-------------------------------------------------- 
+model_name: PPO 
+flags: 00101 
+Action counter:  [23699, 30971, 491333, 4909] 
+Action: 2 
+Good: 197 
+Wrong: 295 
+rew_simility: 0 
+rew_len: 0 
+reward_factor: 0 
+reward_diff_step: 0 
+reward_len_agree: 0 
+reward_len_disagree: 0 
+Reward: -0.0, Total: 8014.777245857235 
+Current sent: .Government leakers are 'enemies to our state,' White House official says 
+ Markets Insider. 
+Agree list: 
+["Government leakers are 'enemies to our state,' White House official says\n"] 
+Disagree list 
+[] 

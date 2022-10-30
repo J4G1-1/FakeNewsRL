@@ -1,0 +1,19 @@
+-------------------------------------------------- 
+model_name: DQN 
+flags: 11111 
+Action counter:  [244351, 119423, 165513, 20713] 
+Action: 0 
+Good: 1034 
+Wrong: 1111 
+rew_simility: 0 
+rew_len: 0 
+reward_factor: 0 
+reward_diff_step: 0 
+reward_len_agree: 0 
+reward_len_disagree: 0 
+Reward: -0.0, Total: -61727.04328285766 
+Current sent: Do Not Sell My Personal Information. 
+Agree list: 
+["Trump's immigration opening falls flat with key audience: Democrats\n", ".Trump's immigration opening falls flat with key audience: Democrats \n Reuters.com.\n", 'World.\n'] 
+Disagree list 
+['International.\n', 'U.S. Politics.\n', 'United States.\n', 'United Kingdom.\n', 'China.\n', 'India.\n', 'Americas.\n', 'Europe.\n', 'Legal.\n', 'Energy.\n', 'Environment.\n', 'Bonds.\n', 'Commodities.\n', 'Currencies.\n', 'Breakingviews.\n', 'Lifestyle.\n', 'All quotes delayed a minimum of 15 minutes.\n', 'Corrections.\n', 'Terms of Use.\n'] 
