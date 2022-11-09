@@ -4,11 +4,11 @@
 # Este programa implementa un agente de reinforcement learning para detectar noticias falsas
 
 
-#Para su uso se tienen que hacer lo siguiente (En linux, ubuntu):
+# Para su uso se tienen que hacer lo siguiente (En linux, ubuntu):
 
-#1. Instalar geckodriver PARA FIREFOX en su máquina.
+# 1. Instalar geckodriver PARA FIREFOX en su máquina.
 
-#2. En la carpeta principal del proyecto, crear un ambiente virtual con python con el siguiente código:
+# 2. En la carpeta principal del proyecto, crear un ambiente virtual con python con el siguiente código:
 #   python3 -m venv ./FakeNewEnv
 #  y activarlo con el siguiente comando: source ./FakeNewEnv/bin/activate
   
