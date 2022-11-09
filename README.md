@@ -13,7 +13,7 @@ Para su uso se tienen que hacer lo siguiente (En linux, ubuntu):
   y activarlo con el siguiente comando: source ./FakeNewEnv/bin/activate
   
 3. Para hacer la instalación de los paquetes de python correr: pip install -r requirements.txt
- Se tiene que estar enla carpeta principal
+ Se tiene que estar en la carpeta principal
  
 4. Para usarlo en la carpeta main, correr python core.py (también se puede con python3 core.py)
 
