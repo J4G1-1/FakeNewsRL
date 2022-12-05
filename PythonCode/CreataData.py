@@ -68,7 +68,7 @@ class thread_news(threading.Thread):
         print('Termino ',self.thread_ID)
         self.webScrapper.Terminar()
 
-dataFrameNews = pd.read_csv(r"/home/serapf/Desktop/FakeNewsRL/PythonCode/data/DataFakeNews.csv")
+dataFrameNews = pd.read_csv(r"./data/DataFakeNews.csv")
 
 global_begin = 300
 global_end = 600
@@ -96,3 +96,4 @@ with open(f'chunk_{global_begin}-{global_end}', "wb") as fp:   #Pickling
 
 
 print('terminado')
+
