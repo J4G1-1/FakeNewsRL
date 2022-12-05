@@ -1,3 +1,4 @@
+sentence-transformers==2.2.2
 absl-py==1.2.0
 async-generator==1.10
 attrs==22.1.0
@@ -79,3 +80,4 @@ wasabi==0.10.1
 Werkzeug==2.2.2
 wsproto==1.2.0
 zipp==3.9.0
+
