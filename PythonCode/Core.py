@@ -13,6 +13,8 @@ from datetime import datetime
 
 
 model_name = 'A2C'
+#si usas windows cambia el formato de 11:13:10 y escribe
+#en su lugar 11_13_10
 brain_version = 'brain - 10 15 2022, 11:13:10.zip'
 path = f"./models/{model_name}/{brain_version}"
 model_info = {'name': model_name,'path':None}
