@@ -1,4 +1,6 @@
 import numpy as np
+from sentence_transformers import SentenceTransformer, util
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
 #Esta clase define la estructura de datos que se encarga de 
 #gestionar las listas de agree, disagree y el sent que se está leyendo
@@ -68,7 +70,12 @@ class ArgumentList:
     similarity_list = []
 
     for sent_in_list in self.agreelist:
-        similarity_list.append(sent_in_list["sent_no_stopwords"].similarity(sent_no_stopwords))
+        emb1 = model.encode(str(sent_in_list["sent_no_stopwords"]))
+        emb2 = model.encode(str(sent_no_stopwords))
+        #calculo de similaridad con el coseno
+        cos_sim = util.cos_sim(emb1, emb2)
+        similarity_list.append(cos_sim.item())
+        #similarity_list.append(sent_in_list["sent_no_stopwords"].similarity(sent_no_stopwords))
 
     self.agreelist.append({"sent": sent,
                             "sent_no_stopwords" : sent_no_stopwords})
@@ -87,7 +94,12 @@ class ArgumentList:
     similarity_list = []
 
     for sent_in_list in self.disagreelist:
-        similarity_list.append(sent_in_list["sent_no_stopwords"].similarity(sent_no_stopwords))
+        emb1 = model.encode(str(sent_in_list["sent_no_stopwords"]))
+        emb2 = model.encode(str(sent_no_stopwords))
+        #calculo de similaridad con el coseno
+        cos_sim = util.cos_sim(emb1, emb2)
+        similarity_list.append(cos_sim.item())
+        #similarity_list.append(sent_in_list["sent_no_stopwords"].similarity(sent_no_stopwords))
 
     self.disagreelist.append({"sent": sent,
                             "sent_no_stopwords" : sent_no_stopwords})
