@@ -63,9 +63,9 @@ class FakeNewsEnv(gym.Env):
 
     #Creacion del dirver para webscrapping
     if train_mode:
-      self.dataManager = LocalDataManager(localdata_path='/home/serapf/Desktop/github/FakeNewsRL/chunk_0-600')
+      self.dataManager = LocalDataManager(localdata_path='../chunk_0-600')
     else:
-      self.dataManager = WebDataManager(r"/home/serapf/Desktop/FakeNewsRL/PythonCode/data/DataFakeNews.csv")
+      self.dataManager = WebDataManager(r"./data/DataFakeNews.csv")
 
     #Creacion de la estrucutra de datos de listas
     self.argumentLists = ArgumentList(self.nlp)
