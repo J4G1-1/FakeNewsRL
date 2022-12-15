@@ -17,8 +17,9 @@ Para su uso se tienen que hacer lo siguiente (En linux, ubuntu):
  
 4. Para usarlo en la carpeta main, correr python core.py (también se puede con python3 core.py)
 
-5. (opcional) utilice el comando nice, e introduzca el nombre del modelo a usar y la flag deseada (revise core.py para mas información sobre esto).\n
- Comando de ejemplo: nice python3 ./Core.py PPO 11101
+5. (opcional) utilice el comando nice, e introduzca el nombre del modelo a usar y la flag deseada (revise core.py para mas información sobre esto).
+
+Comando de ejemplo: nice python3 ./Core.py PPO 11101
 
 
 
