@@ -36,7 +36,7 @@ Al ejecutar este archivo, se pueden recibir 3 argumentos opcionales.
 
 3.- El modelo a usar("brain - version.zip"), este deberia estar guardado 
     en la carpeta ./models/{model_name}/ donde model_name in {"PPO", "DQN", "A2C"},
-    si no se encuentra, entonces se creara uno nuevo.
+    sino se encuentra, entonces se creara uno nuevo.
 
 """
 
