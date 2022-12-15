@@ -262,9 +262,14 @@ class FakeNewsEnv(gym.Env):
 
       #Reward de tamaño
       if self.flags[4] == '1':
-        reward_len_agree = self.sigmodialFunction(len(agreelist),4.5,-0.6,4,-2)
-        reward_len_disagree = self.sigmodialFunction(len(disagreelist),4.5,-0.6,4,-2)
-
+        try:#si agreelist y disagreelist existen, entonces
+          reward_len_agree = self.sigmodialFunction(len(agreelist),4.5,-0.6,4,-2)
+          reward_len_disagree = self.sigmodialFunction(len(disagreelist),4.5,-0.6,4,-2)
+          
+        except:
+          reward_len_agree = self.sigmodialFunction(0,4.5,-0.6,4,-2)
+          reward_len_disagree = self.sigmodialFunction(0,4.5,-0.6,4,-2)
+          
       reward = reward_len_agree + reward_len_disagree + reward
 
     observation = self.BuildObservation()
