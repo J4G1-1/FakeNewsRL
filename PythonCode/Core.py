@@ -5,6 +5,8 @@ from stable_baselines3 import PPO
 from stable_baselines3 import DQN
 from stable_baselines3 import A2C
 
+#importamos sys para leer argumentos desde la terminal
+import sys
 
 import os
 from FakeNewsEnv import FakeNewsEnv
@@ -12,15 +14,57 @@ from FakeNewsEnv import FakeNewsEnv
 from datetime import datetime
 
 
-model_name = 'A2C'
-#si usas windows cambia el formato de 11:13:10 y escribe
-#en su lugar 11_13_10
-brain_version = 'brain - 10 15 2022, 11:13:10.zip'
+"""
+Al ejecutar este archivo, se pueden recibir 3 argumentos opcionales.
+
+1.- El nombre del modelo a usar {"PPO", "DQN", "A2C"}
+
+2.- La flag a usar, es una cadena de 5 caracteres conformada 
+    por 0's y 1's e.g. "11101".
+    
+    En la flag el caracter en la posición i (las posiciones se cuentan desde
+    0 a 4) de la cadena indica si la opcion i en la creación del ambiente
+    se activará.
+
+    #opciones de creación del ambiente
+    # 0: Similitud al insertar
+    # 1: Longitud de sent insertado
+    # 2: Descision diff
+    # 3: Reward por repetir step
+    # 4: Reward por el tamaño de cada lista
+
+
+3.- El modelo a usar("brain - version.zip"), este deberia estar guardado 
+    en la carpeta ./models/{model_name}/ donde model_name in {"PPO", "DQN", "A2C"},
+    si no se encuentra, entonces se creara uno nuevo.
+
+"""
+
+
+
+try:
+    # sys.argv[1] in {"PPO", "DQN", "A2C"}
+    model_name = sys.argv[1]
+except:
+    #entonces se usar por default, "A2C"
+    model_name = 'A2C'
+
+
+try:
+    model_name = sys.argv[3]
+except:
+    #entonces se usar uno por default.
+    brain_version  = 'brain - 12 14 2022, 17 21 28.zip'
+
+
+
+#ruta para localizar el modelo seleccionado
 path = f"./models/{model_name}/{brain_version}"
-model_info = {'name': model_name,'path':None}
+
+model_info = {'name': model_name,'path':path}
 
 ##Carpetas para hacer guardar logs para tensorboard y modelos
-models_dir = f"models/{model_name}"
+models_dir = f"./models/{model_name}"
 logdir = "logs"
 logcustom = "logscustom"
 
@@ -40,7 +84,13 @@ if not os.path.exists(logcustom):
 # 3: Reward por repetir step
 # 4: Reward por el tamaño de cada lista
 
-flags = '11111'
+try:
+    flags = str(sys.argv[2])
+except:#se usaria por default la flag "11111"
+    flags = '11111'
+
+
+#creacion del ambiente
 env = FakeNewsEnv(flags,True,model_name)
 
 #Creación de modelo de RL PPO
@@ -84,16 +134,16 @@ TIMESTEPS = TIMESTEPS_PER_EVALUATION * NUMBER_OF_EVALUATIONS
 
 #fecha de la creacion del modelo
 now = datetime.now() # current date and time
-date_time = now.strftime("%m %d %Y, %H:%M:%S")
+date_time = now.strftime("%m %d %Y, %H %M %S")
 
-#input('Presiona enter para iniciar entrenamiento')
+input('Presiona enter para iniciar entrenamiento')
 
-#COmenzar el entrenamiento del modelo 
+#Comenzar el entrenamiento del modelo 
 log_name = f'{model_name} - {date_time} - {flags}'
 model.learn(total_timesteps=TIMESTEPS, tb_log_name=log_name)
 
 #Guardar el checkpoint del modelo
-print("saving the model...")
+print("saving the model...",f"{models_dir}/brain - {date_time}.zip")
 model.save(f"{models_dir}/brain - {date_time}")
 
 env.WriteCurrentLog(log_name)
