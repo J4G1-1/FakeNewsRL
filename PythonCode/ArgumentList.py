@@ -1,4 +1,6 @@
 import numpy as np
+
+#usando esta libreria ya no sera necesarior usar sents sin stopwords.
 from sentence_transformers import SentenceTransformer, util
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
@@ -11,7 +13,8 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 # disagree list Guarda todos los sents que apunten que la noticia sea falsa
 # Las dos listas anteriores guardan diccionario que tienen la siguiente estrucutra:
 #     sent: Contiene al sent completo
-#     sent_no_stopwords: Guarda una copia del sent pero sin incluir stop words (para calcular la similaridad)
+#     sent_no_stopwords: Guarda una copia del sent pero sin incluir stop words
+#     (para calcular la similaridad)
 #
 # accumulatedAgree: Es la suma de todos los vectores del agree list
 # accumulatedDisagree: Es la suma de todos los vectores del disagree list
@@ -29,7 +32,7 @@ class ArgumentList:
   def resetLists(self):
     self.current_sent = None
     self.sent_list = []
-    self.sent_index = 0
+    self.sent_index = 0    
 
     self.agreelist = []
     self.accumulatedAgree = np.zeros(300)
@@ -41,68 +44,75 @@ class ArgumentList:
     self.sent_list = sent_list
     self.sent_index = 0
     self.current_sent = self.sent_list[0]
+    
+  def cal_similarity(self, sent1, sent2):
+    """
+    calcula la similitud entre la sentencia 1 y la sentencia 2
+    usando la libreria sentence_transformers.
 
-  #Metodo auxiliar para elaborar la copia sent_no_stopwords
-  def GetStopWordsSent(self,sent):
-    text = ""
+    Parameters
+    ----------
+    sent1 : numpy.ndarray
+        sentencia 1.
+    sent2 : numpy.ndarray
+        sentencia 2.
 
-    for token in sent:
-        if not token.is_stop:
-            text = text + token.text + " "
-        
-    no_stopword_doc = self.nlp(text)
-
-    return no_stopword_doc
+    Returns
+    -------
+    Float64
+    """
+    cos_sim = util.cos_sim(sent1, sent2)
+    return cos_sim.item()
+    
 
   #Agregar el sent al agree list
   #Regresa un vector que contiene la similitud que tiene el sent en cuestión
-  #con los sent que ya estaban el la lista, esto para calcular recompensa.
+  #con los sent que ya estaban en la lista, esto para calcular recompensa.
   #Para calcular la similitud se hace uso del sent pero sin stop words.
-  def append_agree_list(self,sent):
+  def append_agree_list(self, sent):
 
     #Se suma el vector del sent a agregar al accumulated agree
     self.accumulatedAgree = np.add(self.accumulatedAgree, sent.vector)
-
-    #Uso de metodo auxiliar para obtener el sent sin stopwords
-    sent_no_stopwords = self.GetStopWordsSent(sent)
-
-    #Calculo de la similitud del sent nuevo son los sent de la lista
+        
+    #Calculo de la similitud del sent nuevo con los sent de la lista
     similarity_list = []
-
-    for sent_in_list in self.agreelist:
-        emb1 = model.encode(str(sent_in_list["sent_no_stopwords"]))
-        emb2 = model.encode(str(sent_no_stopwords))
-        #calculo de similaridad con el coseno
-        cos_sim = util.cos_sim(emb1, emb2)
-        similarity_list.append(cos_sim.item())
-        #similarity_list.append(sent_in_list["sent_no_stopwords"].similarity(sent_no_stopwords))
-
-    self.agreelist.append({"sent": sent,
-                            "sent_no_stopwords" : sent_no_stopwords})
     
+    #embeding1, codificacion del sent usando SentenceTransformer
+    emb1 = model.encode(str(sent))
+    
+    #calculamos la similaridad del sent con los demas
+    #sents en agreelist
+    for sent_in_list in self.agreelist:            
+        emb2 = model.encode(str(sent_in_list))
+            
+        similarity_list.append(self.cal_similarity(emb1, emb2))
+    
+    #agregamos el sent al agreelist
+    self.agreelist.append(sent)
+        
     return similarity_list
 
   #Mismo proceso que agreelist pero usando el disagree list
   def append_disagree_list(self,sent):
-
+    
+    #Se suma el vector del sent a agregar al accumulated Disagree
     self.accumulatedDisagree = np.add(self.accumulatedDisagree, sent.vector)
-
-    #Uso de metodo auxiliar para obtener el sent sin stopwords
-    sent_no_stopwords = self.GetStopWordsSent(sent)
-
+    
     #Calculo de la similitud del sent nuevo son los sent de la lista
     similarity_list = []
-
-    for sent_in_list in self.disagreelist:
-        emb1 = model.encode(str(sent_in_list["sent_no_stopwords"]))
-        emb2 = model.encode(str(sent_no_stopwords))
-        #calculo de similaridad con el coseno
-        cos_sim = util.cos_sim(emb1, emb2)
-        similarity_list.append(cos_sim.item())
-        #similarity_list.append(sent_in_list["sent_no_stopwords"].similarity(sent_no_stopwords))
-
-    self.disagreelist.append({"sent": sent,
-                            "sent_no_stopwords" : sent_no_stopwords})
+        
+    #embeding1, codificacion del sent usando SentenceTransformer
+    emb1 = model.encode(str(sent))
+    
+    #calculamos la similaridad del sent con los demas
+    #sents en disagreelist
+    for sent_in_list in self.disagreelist:            
+        emb2 = model.encode(str(sent_in_list))
+        
+        similarity_list.append(self.cal_similarity(emb1, emb2))                         
+    
+    #agregamos el sent al disagreelist
+    self.disagreelist.append(sent)
 
     return similarity_list
   
@@ -144,19 +154,19 @@ class ArgumentList:
         return -1
   
   def getAgreeList(self):
-    return [sent["sent"].text + "\n" for sent in self.agreelist]
+    return [sent.text + "\n" for sent in self.agreelist]
 
   def getDisagreeList(self):
-    return [sent["sent"].text + "\n" for sent in self.disagreelist]
+    return [sent.text + "\n" for sent in self.disagreelist]
 
   #Para imprimir el contenido en texto de cada list
   def PrintList(self):
     print("Agree List: ")
 
     for element in self.agreelist:
-      print(element["sent"].text)
+      print(element.text)
 
     print("Disagree List: ")
     
     for element in self.disagreelist:
-      print(element["sent"].text)
+      print(element.text)
