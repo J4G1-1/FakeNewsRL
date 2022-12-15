@@ -1,6 +1,6 @@
 import numpy as np
 
-#usando esta libreria ya no sera necesarior usar sents sin stopwords.
+#usando esta libreria ya no sera necesario usar sents sin stopwords.
 from sentence_transformers import SentenceTransformer, util
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
@@ -11,10 +11,6 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # agree list: Guarda todos los sents que apunten que la noticia sea verdadera
 # disagree list Guarda todos los sents que apunten que la noticia sea falsa
-# Las dos listas anteriores guardan diccionario que tienen la siguiente estrucutra:
-#     sent: Contiene al sent completo
-#     sent_no_stopwords: Guarda una copia del sent pero sin incluir stop words
-#     (para calcular la similaridad)
 #
 # accumulatedAgree: Es la suma de todos los vectores del agree list
 # accumulatedDisagree: Es la suma de todos los vectores del disagree list
@@ -68,7 +64,7 @@ class ArgumentList:
   #Agregar el sent al agree list
   #Regresa un vector que contiene la similitud que tiene el sent en cuestión
   #con los sent que ya estaban en la lista, esto para calcular recompensa.
-  #Para calcular la similitud se hace uso del sent pero sin stop words.
+  
   def append_agree_list(self, sent):
 
     #Se suma el vector del sent a agregar al accumulated agree
@@ -77,7 +73,7 @@ class ArgumentList:
     #Calculo de la similitud del sent nuevo con los sent de la lista
     similarity_list = []
     
-    #embeding1, codificacion del sent usando SentenceTransformer
+    #embedding1, codificacion del sent usando SentenceTransformer
     emb1 = model.encode(str(sent))
     
     #calculamos la similaridad del sent con los demas
@@ -101,7 +97,7 @@ class ArgumentList:
     #Calculo de la similitud del sent nuevo son los sent de la lista
     similarity_list = []
         
-    #embeding1, codificacion del sent usando SentenceTransformer
+    #embedding1, codificacion del sent usando SentenceTransformer
     emb1 = model.encode(str(sent))
     
     #calculamos la similaridad del sent con los demas
