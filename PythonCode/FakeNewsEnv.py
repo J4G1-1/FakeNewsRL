@@ -16,6 +16,7 @@ from WebDataManager import WebDataManager
 
 from WebScrapper import WebScrapper
 from ArgumentList import ArgumentList
+#import RewarForDates
 
 #La clase FakeNewsEnv es una clase que implementa un gym environment
 #Su objetivo es definir 
@@ -29,7 +30,7 @@ class FakeNewsEnv(gym.Env):
     # Define action and observation space
     # They must be gym.spaces objects
     # Example when using discrete actions:
-
+    self.reward_for_dates=[[],[]]
     self.action_counter=[0,0,0,0]
     self.flags = flags
     self.model_name = model_name
@@ -65,13 +66,15 @@ class FakeNewsEnv(gym.Env):
     if train_mode:
       self.dataManager = LocalDataManager(localdata_path='../chunk_0-600')
     else:
-      self.dataManager = WebDataManager(r"./data/DataFakeNews.csv")
+      self.dataManager = WebDataManager(r"./data/news.csv")
 
     #Creacion de la estrucutra de datos de listas
     self.argumentLists = ArgumentList(self.nlp)
+        
     
     #Contabilizar el total_reward
     self.total_reward = 0
+    
 
     #-----------------------------------------
     self.GaussianFactorList = []
@@ -100,7 +103,7 @@ class FakeNewsEnv(gym.Env):
   def sigmodialFunction(self,value, factor, estrecho, desx, desy):
     return factor/(1+pow(e+estrecho,-(value-desx))) + desy
     
-  def GetSents(self,text):
+  def GetSents(self, text):
     try:
       doc = self.nlp(text)
       return [sentence for sentence in doc.sents]
@@ -155,6 +158,8 @@ class FakeNewsEnv(gym.Env):
     reward_diff_step = 0
     reward_len_agree = 0
     reward_len_disagree = 0
+    reward_dates_agreeList = 0
+    reward_dates_disagreeList = 0
 
     ##Ignore sent
     if action==0:
@@ -177,7 +182,7 @@ class FakeNewsEnv(gym.Env):
         reward = -0.0
       else:
 
-        simility_list = self.argumentLists.append_agree_list(present_sent)
+        simility_list, reward_dates_agreeList = self.argumentLists.append_agree_list(present_sent)
 
         ##Calculo de similitud
         if self.flags[0] == '1':
@@ -187,7 +192,9 @@ class FakeNewsEnv(gym.Env):
         if self.flags[1] == '1':
           rew_len = self.sigmodialFunction(len(present_sent),7,-1.3,13,-3.5)
 
-        reward = reward + rew_len + rew_simility
+        reward = reward + rew_len + rew_simility + reward_dates_agreeList
+        if reward_dates_agreeList!=0:
+          self.reward_for_dates[0].append(reward_dates_agreeList)
 
     ##Add to objection
     if action==2:
@@ -200,7 +207,8 @@ class FakeNewsEnv(gym.Env):
         reward = -0.0
       else:
         
-        simility_list = self.argumentLists.append_disagree_list(present_sent)
+        simility_list, reward_dates_disagreeList = self.argumentLists.append_disagree_list(present_sent)
+        
         ##Calculo de similitud
         if self.flags[0] == '1':
           rew_simility = self.SimilarityReward(simility_list)
@@ -209,7 +217,9 @@ class FakeNewsEnv(gym.Env):
         if self.flags[1] == '1':
           rew_len = self.sigmodialFunction(len(present_sent),7,-1.3,13,-3.5)
 
-        reward = reward + rew_len + rew_simility
+        reward = reward + rew_len + rew_simility + reward_dates_disagreeList
+        if reward_dates_disagreeList!=0:
+          self.reward_for_dates[1].append(reward_dates_disagreeList)
 
 
     ##Go to the next url
@@ -291,6 +301,8 @@ class FakeNewsEnv(gym.Env):
           f'reward_diff_step: {reward_diff_step} \n' + \
           f'reward_len_agree: {reward_len_agree} \n' + \
           f'reward_len_disagree: {reward_len_disagree} \n' + \
+          f'Reward for dates in agreelist: {reward_dates_agreeList} \n' + \
+          f'Reward for dates in disagreelist: {reward_dates_disagreeList} \n' + \
           f'Reward: {reward}, Total: {self.total_reward} \n' + \
           f'Current sent: {self.argumentLists.GetCurrentSent()} \n' + \
           f'Agree list: \n' + \
