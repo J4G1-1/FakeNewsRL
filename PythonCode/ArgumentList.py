@@ -1,4 +1,5 @@
 import numpy as np
+import RewardForDates as RD
 
 #usando esta libreria ya no sera necesario usar sents sin stopwords.
 from sentence_transformers import SentenceTransformer, util
@@ -34,6 +35,9 @@ class ArgumentList:
     self.accumulatedAgree = np.zeros(300)
     self.disagreelist = []
     self.accumulatedDisagree = np.zeros(300)
+    
+    self.dates_agree = []
+    self.dates_disagree = []
 
   #Carga un nuevo conjunto de sents para su analisis.
   def ChargeSents(self,sent_list):
@@ -66,7 +70,20 @@ class ArgumentList:
   #con los sent que ya estaban en la lista, esto para calcular recompensa.
   
   def append_agree_list(self, sent):
-
+    #extraemos las fechas dentro del sent
+    dates_in_sent = RD.extract_datetime(sent, self.nlp)
+    if len(dates_in_sent)!=0:
+        self.dates_agree.append(dates_in_sent)
+    
+    if len(self.dates_agree)>1:
+        #formamos tuplas de fechas, usando las obtenidas en el
+        #actual sent y el anterior
+        date_list = [(i,j) for i in self.dates_agree[-1] for j in self.dates_agree[-2]]
+        #calculamos la similaridad entre las fechas
+        reward_dates = RD.similarity_dates(date_list, self.nlp)
+    else:
+        reward_dates=0
+    
     #Se suma el vector del sent a agregar al accumulated agree
     self.accumulatedAgree = np.add(self.accumulatedAgree, sent.vector)
         
@@ -78,7 +95,7 @@ class ArgumentList:
     
     #calculamos la similaridad del sent con los demas
     #sents en agreelist
-    for sent_in_list in self.agreelist:            
+    for sent_in_list in self.agreelist:
         emb2 = model.encode(str(sent_in_list))
             
         similarity_list.append(self.cal_similarity(emb1, emb2))
@@ -86,10 +103,23 @@ class ArgumentList:
     #agregamos el sent al agreelist
     self.agreelist.append(sent)
         
-    return similarity_list
+    return [similarity_list, reward_dates]
 
   #Mismo proceso que agreelist pero usando el disagree list
-  def append_disagree_list(self,sent):
+  def append_disagree_list(self, sent):
+    #extraemos las fechas dentro del sent
+    dates_in_sent = RD.extract_datetime(sent, self.nlp)
+    if len(dates_in_sent)!=0:
+        self.dates_disagree.append(dates_in_sent)
+    
+    if len(self.dates_disagree)>1:
+        #formamos tuplas de fechas, usando las obtenidas en el
+        #actual sent y el anterior
+        date_list = [(i,j) for i in self.dates_disagree[-1] for j in self.dates_disagree[-2]]
+        #calculamos la similaridad entre las fechas
+        reward_dates = RD.similarity_dates(date_list, self.nlp)
+    else:
+        reward_dates=0
     
     #Se suma el vector del sent a agregar al accumulated Disagree
     self.accumulatedDisagree = np.add(self.accumulatedDisagree, sent.vector)
@@ -110,7 +140,7 @@ class ArgumentList:
     #agregamos el sent al disagreelist
     self.disagreelist.append(sent)
 
-    return similarity_list
+    return [similarity_list, reward_dates]
   
   #De la lista de sent va al siguiente sent para su analisis.
   #Si ya no hay sents se envi auno False
@@ -125,7 +155,7 @@ class ArgumentList:
   
   #Getters y setters de cada componente
   def GetCurrentSent(self):
-        return self.current_sent
+        return self.current_sent  
 
   def GetAccumalatedAgree(self):
         return self.accumulatedAgree
@@ -166,3 +196,5 @@ class ArgumentList:
     
     for element in self.disagreelist:
       print(element.text)
+
+
