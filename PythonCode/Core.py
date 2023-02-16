@@ -47,14 +47,14 @@ try:
     model_name = sys.argv[1]
 except:
     #entonces se usar por default, "A2C"
-    model_name = 'A2C'
+    model_name = 'PPO'
 
 
 try:
     model_name = sys.argv[3]
 except:
     #entonces se usar uno por default.
-    brain_version  = 'brain - 12 14 2022, 17 21 28.zip'
+    brain_version  = 'brain - 12 12 2022, 18 12 50.zip'
 
 
 
@@ -86,12 +86,12 @@ if not os.path.exists(logcustom):
 
 try:
     flags = str(sys.argv[2])
-except:#se usaria por default la flag "11111"
-    flags = '11111'
+except:#se usaria por default la flag "11101"
+    flags = '11101'
 
 
 #creacion del ambiente
-env = FakeNewsEnv(flags,True,model_name)
+env = FakeNewsEnv(flags,True, model_name)
 
 #Creación de modelo de RL PPO
 if model_info['name'] == 'PPO':
@@ -125,7 +125,7 @@ TIMESTEPS_PER_EVALUATION = 100
 
 
 #Es el numero de evaluación (puntos en tensorboard)
-NUMBER_OF_EVALUATIONS = 5500
+NUMBER_OF_EVALUATIONS = 3500
 
 #Total de pasos por hacer
 TIMESTEPS = TIMESTEPS_PER_EVALUATION * NUMBER_OF_EVALUATIONS
@@ -136,7 +136,7 @@ TIMESTEPS = TIMESTEPS_PER_EVALUATION * NUMBER_OF_EVALUATIONS
 now = datetime.now() # current date and time
 date_time = now.strftime("%m %d %Y, %H %M %S")
 
-input('Presiona enter para iniciar entrenamiento')
+#input('Presiona enter para iniciar:')
 
 #Comenzar el entrenamiento del modelo 
 log_name = f'{model_name} - {date_time} - {flags}'
@@ -147,3 +147,11 @@ print("saving the model...",f"{models_dir}/brain - {date_time}.zip")
 model.save(f"{models_dir}/brain - {date_time}")
 
 env.WriteCurrentLog(log_name)
+
+"""
+try:
+    
+    print(env.reward_for_dates[0],'_'*20)
+    print(env.reward_for_dates[1])
+except:pass
+"""
