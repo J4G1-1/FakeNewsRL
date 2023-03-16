@@ -38,9 +38,9 @@ class WebScrapper:
     self.data = ''
 
   #El método busca en internet el string phrase y guarda los url devueltos.
-  #TODO: El méotodo actualmente usa duckduck, sin embargo con la estrucutra
+  #TODO: El método actualmente usa duckduck, sin embargo con la estrucutra
   #hecha se puede usar google si el debido método es llamado. Por lo tanto,
-  # se podría mejorar si da la opción de escoger el navegador a usar. Aparte
+  # se podría mejorar si da la opción de escoger el buscador a usar. Aparte
   # implementar otros navegadores como yahoo, bing, etc.
   def ChargeFromWeb(self, phrase):
     self.urls_index = 0
@@ -86,6 +86,19 @@ class WebScrapper:
         webpages = self.driver.find_elements(by=By.XPATH, value = xpath)
         urls = [webpage.get_attribute("href") for webpage in webpages]
 
+        
+        
+        def is_not_a_document(url)->bool:
+          #return True if the url does not correspond to a text document
+          extensions = [".pdf",".doc", ".docx", ".txt", "csv", ".xls", ".xlsx", ".xlsm" , ".xlsb",]
+          for i in extensions:
+            if i in url:return False
+          return True
+        
+        #filtramos las urls para obtener aquellas que no sean de documentos de texto
+        urls = list(filter(is_not_a_document, urls))
+        
+        #ordenamos de manera aleatoria
         random.shuffle(urls)
 
         return urls
