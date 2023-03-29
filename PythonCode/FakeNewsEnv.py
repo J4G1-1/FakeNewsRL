@@ -14,6 +14,7 @@ import os
 from LocalDataManager import LocalDataManager
 from WebDataManager import WebDataManager
 
+import pickle
 from WebScrapper import WebScrapper
 from ArgumentList import ArgumentList
 #import RewarForDates
@@ -25,7 +26,7 @@ class FakeNewsEnv(gym.Env):
   """Custom Environment that follows gym interface"""
   metadata = {'render.modes': ['human']}
 
-  def __init__(self,flags, train_mode = False, model_name = ''):
+  def __init__(self,flags, train_mode = False, model_name = '', local_data_path = ''):
     super(FakeNewsEnv, self).__init__()
     # Define action and observation space
     # They must be gym.spaces objects
@@ -34,6 +35,7 @@ class FakeNewsEnv(gym.Env):
     self.action_counter=[0,0,0,0]
     self.flags = flags
     self.model_name = model_name
+    self.train_mode = train_mode
 
     #Crear carpetas de logs escritos por el programador
     self.logcustom = "logscustom"
@@ -41,6 +43,8 @@ class FakeNewsEnv(gym.Env):
       os.makedirs(self.logcustom)
     
     self.log = ''
+    self.outcome = {}
+    self.outcome_log = []
 
     #Actions
     #El agente tiene 4 acciones:
@@ -63,20 +67,18 @@ class FakeNewsEnv(gym.Env):
     self.nlp = spacy.load("en_core_web_md")
 
     #Creacion del dirver para webscrapping
-    if train_mode:
-      self.dataManager = LocalDataManager(localdata_path='../chunk_0-600')
+    if self.train_mode:
+      self.dataManager = LocalDataManager(localdata_path=local_data_path)
     else:
       self.dataManager = WebDataManager(r"./data/DataFakeNews.csv")
       
 
     #Creacion de la estrucutra de datos de listas
     self.argumentLists = ArgumentList(self.nlp)
-        
-    
+            
     #Contabilizar el total_reward
     self.total_reward = 0
     
-
     #-----------------------------------------
     self.GaussianFactorList = []
     mu = 0
@@ -193,7 +195,7 @@ class FakeNewsEnv(gym.Env):
         if self.flags[1] == '1':
           rew_len = self.sigmodialFunction(len(present_sent),7,-1.3,13,-3.5)
 
-        reward = reward + rew_len + rew_simility + reward_dates_agreeList
+        reward = reward + rew_len + rew_simility + reward_dates_agreeList + self.reward_for_ads
         if reward_dates_agreeList!=0:
           self.reward_for_dates[0].append(reward_dates_agreeList)
 
@@ -218,7 +220,7 @@ class FakeNewsEnv(gym.Env):
         if self.flags[1] == '1':
           rew_len = self.sigmodialFunction(len(present_sent),7,-1.3,13,-3.5)
 
-        reward = reward + rew_len + rew_simility + reward_dates_disagreeList
+        reward = reward + rew_len + rew_simility + reward_dates_disagreeList + self.reward_for_ads
         if reward_dates_disagreeList!=0:
           self.reward_for_dates[1].append(reward_dates_disagreeList)
 
@@ -240,20 +242,22 @@ class FakeNewsEnv(gym.Env):
         
         #Difference in list reward
         reward_factor = self.sigmodialFunction(diff,3.4,-0.5,4.4,0)
-
-        if not status:
+        
+        if isFinished:
 
           if decision == -1:
             reward = 0 + reward
+            
           elif self.label == decision:
             self.counter_good = self.counter_good + 1
-            reward = reward_factor + reward
+            reward = reward_factor + reward + (self.num_of_ads)/(self.num_of_ads+1)
           else:
             self.counter_wrong = self.counter_wrong + 1
-            reward = -reward_factor + reward
+            reward = -reward_factor + reward - (self.num_of_ads)/(self.num_of_ads+1)
         
         else:
-          reward_factor = 0.05*reward_factor
+          
+          reward_factor = (0.05)*reward_factor
           if decision == -1:
             reward = 0 + reward
           elif self.label == decision:
@@ -285,10 +289,23 @@ class FakeNewsEnv(gym.Env):
 
     observation = self.BuildObservation()
 
-    info = {}
+    info = {}    
 
-    self.total_reward = self.total_reward + reward
-
+    self.total_reward = self.total_reward + reward# + self.reward_for_ads
+    
+    if isFinished:
+      self.outcome = {'title':self.title,
+                      'agree_list':self.argumentLists.getAgreeList(),
+                      'disagree_list':self.argumentLists.getDisagreeList(),
+                      'label':self.label,
+                      'outcome':self.argumentLists.GetDecision(),
+                      'certainty':reward_factor,                      
+                      'total_reward':self.total_reward,
+                      'Good' : self.counter_good,
+                      'Wrong' : self.counter_wrong,                      
+                      }
+      self.outcome_log.append(self.outcome)
+    
     self.log = f'-------------------------------------------------- \n' + \
           f'model_name: {self.model_name} \n' + \
           f'flags: {self.flags} \n' + \
@@ -305,12 +322,10 @@ class FakeNewsEnv(gym.Env):
           f'Reward for dates in agreelist: {reward_dates_agreeList} \n' + \
           f'Reward for dates in disagreelist: {reward_dates_disagreeList} \n' + \
           f'Reward: {reward}, Total: {self.total_reward} \n' + \
-          f'Current sent: {self.argumentLists.GetCurrentSent()} \n' + \
-          f'Agree list: \n' + \
-          f'{self.argumentLists.getAgreeList()} \n' + \
-          f'Disagree list \n' + \
-          f'{self.argumentLists.getDisagreeList()} \n'
-
+          f'Rewar for ads: {self.reward_for_ads}\n' + \
+          f'Current sent: {self.argumentLists.GetCurrentSent()} \n'
+          
+          
     print(self.log)
 
     return observation, reward, isFinished, info
@@ -338,9 +353,20 @@ class FakeNewsEnv(gym.Env):
           return self.reset()
         elif status == 1:
           break
-
-      title, self.label, text = self.dataManager.GetLoadedData()
-      sents = self.GetSents(text)
+      
+      if not self.train_mode:
+        self.title, self.label, text, self.num_of_ads = self.dataManager.GetLoadedData()
+        sents = self.GetSents(text)
+        
+      else:
+        self.title, self.label, text = self.dataManager.GetLoadedData()
+        sents = self.GetSents(text)
+        self.num_of_ads = 0
+      
+      self.reward_for_ads = (self.num_of_ads)/(self.num_of_ads+1)
+      self.reward_for_ads = -self.reward_for_ads if self.num_of_ads>60 else self.reward_for_ads
+      #self.reward_for_ads = -self.num_of_ads/3 if self.num_of_ads>60 else self.num_of_ads/4  
+              
       if len(sents)>0:
         break        
 
@@ -349,12 +375,12 @@ class FakeNewsEnv(gym.Env):
     self.argumentLists.ChargeSents(sents)
 
     #Agregar el titulo al agree list
-    doc = self.nlp(title)
+    doc = self.nlp(self.title)
     self.argumentLists.append_agree_list(doc)
 
     #Texto de log
     log = f'\n\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n' + \
-          f'title: {title} Label: {self.label} \n' + \
+          f'title: {self.title}. Label: {self.label} #ads:{self.num_of_ads}\n' + \
           ' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n'
       
     print(log)
@@ -364,6 +390,20 @@ class FakeNewsEnv(gym.Env):
     observation = self.BuildObservation()
 
     return observation  # reward, done, info can't be included
+    
+  def cleanOutcomeLog(self):
+    self.outcome_log = []
+  
+  def saveOutcomelog(self, path_name_binary, path_name_plain):
+    with open(path_name_binary, "wb") as fp:   #Pickling
+      pickle.dump(self.outcome_log, fp)
+
+    with open(path_name_plain, 'w') as f:
+      for outcome in self.outcome_log:
+        f.write('\n\n---------------------------------------------------------------\n')
+        for key, value in outcome.items(): 
+            f.write('%s:%s\n' % (key, value))
+    
  
  
   def render(self, mode='human'):
