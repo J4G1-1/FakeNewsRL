@@ -9,6 +9,8 @@ import random
 
 import time
 
+import AdCounter
+
 #La clase de WebScrapper sirve para conseguir información 
 
 # Su funcionamiento es el siguiente:
@@ -23,6 +25,7 @@ class WebScrapper:
   def __init__(self):
     self.urls = []
     self.urls_index = 0
+    self.number_of_ads = 0
 
     firefoxProfile = webdriver.FirefoxProfile()
     firefoxProfile.set_preference('permissions.default.stylesheet', 2)
@@ -32,8 +35,11 @@ class WebScrapper:
     firefoxProfile.set_preference("dom.max_script_run_time", 5)
 
     self.driver = webdriver.Firefox(firefox_profile=firefoxProfile)
+    
+    #tamaño de la ventana
+    self.driver.set_window_size(900,800)
     #Si la página tarda más de 5 segundos, se extrae el html como éste y se sigue
-    self.driver.set_page_load_timeout(5)
+    self.driver.set_page_load_timeout(6)
 
     self.data = ''
 
@@ -137,8 +143,12 @@ class WebScrapper:
       html_text = re.sub('\n', '.', html_text)
       html_text = re.sub('\s{2,}', '.', html_text)
       html_text = re.sub('\[\d+]', '', html_text)
-      self.data = re.sub('\|+|\/+|-+', '\n', html_text)
-
+      self.data = re.sub('\|+|\/+|-+', '', html_text)
+      
+      try:
+         self.number_of_ads=AdCounter.ads_found(soup, self.urls[self.urls_index])
+      except:pass
+      
       return 1
 
     except:
@@ -147,6 +157,9 @@ class WebScrapper:
   #Getter del texto obtenido del html de la última pagina cargada exitosamente.
   def GetLoadedData(self):
     return self.data
+    
+  def GetNumAds(self):
+    return self.number_of_ads
 
   def Terminar(self):
     self.driver.quit()
