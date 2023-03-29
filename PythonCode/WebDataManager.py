@@ -7,6 +7,7 @@ class WebDataManager:
       #Carga de dataset para fakenews
       self.dataFrameNews = pd.read_csv(titles_data_path)
       self.webScrapper = WebScrapper()
+      
 
     def ChargeNewFromFile(self):
         #Se busca el encabezado de una notica cualquiera
@@ -22,4 +23,5 @@ class WebDataManager:
         return self.webScrapper.GotoNextWebPage()
 
     def GetLoadedData(self):
-        return self.title, self.label, self.webScrapper.GetLoadedData()
+        return [self.title, self.label, self.webScrapper.GetLoadedData(),
+         self.webScrapper.GetNumAds()]
