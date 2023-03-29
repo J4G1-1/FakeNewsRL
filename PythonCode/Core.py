@@ -46,7 +46,7 @@ try:
     # sys.argv[1] in {"PPO", "DQN", "A2C"}
     model_name = sys.argv[1]
 except:
-    #entonces se usar por default, "A2C"
+    #entonces se usar por default, "DQN"
     model_name = 'DQN'
 
 
