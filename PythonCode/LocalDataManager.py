@@ -1,5 +1,6 @@
 import pickle
 import random
+import AdCounter
 
 class LocalDataManager:
 
@@ -7,6 +8,7 @@ class LocalDataManager:
       self.dataChunk = []
       self.current_data = ''
       self.datalist = []
+      self.number_of_ads = 0
       with open(localdata_path, "rb") as fp:   # Unpickling
         self.dataChunk = pickle.load(fp)
       self.data_count = 0
@@ -27,10 +29,14 @@ class LocalDataManager:
             return 0
 
         self.current_data = self.datalist[self.data_count]
-
-        return 1
         
+
+        return 1        
 
     def GetLoadedData(self):
         return self.title, self.label, self.current_data
     
+    def GetNumAds(self):
+        return self.number_of_ads
+        
+        

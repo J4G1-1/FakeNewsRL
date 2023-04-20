@@ -54,10 +54,11 @@ try:
     model_name = sys.argv[3]
 except:
     #entonces se usar uno por default.
-    brain_version  = 'brain - 10 26 2022, 02_48_12.zip'
+    #brain_version  = 'brain - 04 18 2023, 17 35 48.zip'
+    brain_version  = 'brain - 10 26 2022, 00_55_02.zip'
 
 
-
+local_data_path = "./../chunk_0-600"
 
 #ruta para localizar el modelo seleccionado
 path = f"./models/{model_name}/{brain_version}"
@@ -87,14 +88,15 @@ if not os.path.exists(logcustom):
 
 try:
     flags = str(sys.argv[2])
-except:#se usaria por default la flag "10111"
+except:#se usaria por default la flag "10101"
+    #flags = '10101'
     flags = '10111'
 
 
 #creacion del ambiente
-env = FakeNewsEnv(flags,False, model_name)
+env = FakeNewsEnv(flags,False, model_name, local_data_path)
 
-#Creación de modelo de RL PPO
+#Creación de modelo de RL DQN
 if model_info['name'] == 'PPO':
     try:
         model = PPO.load(model_info['path'],env)
@@ -122,11 +124,11 @@ elif model_info['name'] == 'A2C':
 
 ##Estos timesteps serán el número de pasos de una evaluación
 ##para hacer un reporte en tensorboard
-TIMESTEPS_PER_EVALUATION = 100
+TIMESTEPS_PER_EVALUATION = 1
 
 
 #Es el numero de evaluación (puntos en tensorboard)
-NUMBER_OF_EVALUATIONS = 12
+NUMBER_OF_EVALUATIONS = 100
 
 #Total de pasos por hacer
 TIMESTEPS = TIMESTEPS_PER_EVALUATION * NUMBER_OF_EVALUATIONS
@@ -137,7 +139,7 @@ TIMESTEPS = TIMESTEPS_PER_EVALUATION * NUMBER_OF_EVALUATIONS
 now = datetime.now() # current date and time
 date_time = now.strftime("%m %d %Y, %H %M %S")
 
-#input('Presiona enter para iniciar:')
+input('Presiona enter para iniciar:')
 
 #Comenzar el entrenamiento del modelo 
 log_name = f'{model_name} - {date_time} - {flags}'
@@ -148,6 +150,12 @@ print("saving the model...",f"{models_dir}/brain - {date_time}.zip")
 model.save(f"{models_dir}/brain - {date_time}")
 
 env.WriteCurrentLog(log_name)
+env.close()
+
+file_ads = open("anuncion.txt",'w')
+for i in env.cantidad_ads:
+    file_ads.writelines(str(i)+'\n')
+file_ads.close()
 
 """
 try:

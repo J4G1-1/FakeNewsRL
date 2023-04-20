@@ -36,6 +36,7 @@ class FakeNewsEnv(gym.Env):
     self.flags = flags
     self.model_name = model_name
     self.train_mode = train_mode
+    self.cantidad_ads = []
 
     #Crear carpetas de logs escritos por el programador
     self.logcustom = "logscustom"
@@ -71,6 +72,7 @@ class FakeNewsEnv(gym.Env):
       self.dataManager = LocalDataManager(localdata_path=local_data_path)
     else:
       self.dataManager = WebDataManager(r"./data/DataFakeNews.csv")
+      #self.dataManager = WebDataManager(r"./data/noti.csv")
       
 
     #Creacion de la estrucutra de datos de listas
@@ -229,6 +231,16 @@ class FakeNewsEnv(gym.Env):
     if action==3:
 
       status = self.dataManager.GoNextArticle()
+      #obtenemos la cantidad de anuncios dentro del articulo
+      self.num_of_ads = self.dataManager.GetNumAds()
+      
+      self.cantidad_ads.append({self.title:self.num_of_ads})
+      
+      #reward for ads      
+      if self.num_of_ads != 0:
+        self.reward_for_ads = 10 if 0<self.num_of_ads<=60 else -10
+      else:
+        self.reward_for_ads = 0
 
       if not status:
         isFinished = True
@@ -240,6 +252,8 @@ class FakeNewsEnv(gym.Env):
 
         diff = abs(len(agreelist) - len(disagreelist))
         
+        
+        
         #Difference in list reward
         reward_factor = self.sigmodialFunction(diff,3.4,-0.5,4.4,0)
         
@@ -250,10 +264,10 @@ class FakeNewsEnv(gym.Env):
             
           elif self.label == decision:
             self.counter_good = self.counter_good + 1
-            reward = reward_factor + reward + (self.num_of_ads)/(self.num_of_ads+1)
+            reward = reward_factor + reward + self.reward_for_ads
           else:
             self.counter_wrong = self.counter_wrong + 1
-            reward = -reward_factor + reward - (self.num_of_ads)/(self.num_of_ads+1)
+            reward = -reward_factor + reward + self.reward_for_ads
         
         else:
           
@@ -291,7 +305,7 @@ class FakeNewsEnv(gym.Env):
 
     info = {}    
 
-    self.total_reward = self.total_reward + reward# + self.reward_for_ads
+    self.total_reward = self.total_reward + reward
     
     if isFinished:
       self.outcome = {'title':self.title,
@@ -355,18 +369,20 @@ class FakeNewsEnv(gym.Env):
           break
       
       if not self.train_mode:
-        self.title, self.label, text, self.num_of_ads = self.dataManager.GetLoadedData()
+        self.title, self.label, text = self.dataManager.GetLoadedData()
         sents = self.GetSents(text)
         
       else:
         self.title, self.label, text = self.dataManager.GetLoadedData()
         sents = self.GetSents(text)
-        self.num_of_ads = 0
+        
       
-      self.reward_for_ads = (self.num_of_ads)/(self.num_of_ads+1)
-      self.reward_for_ads = -self.reward_for_ads if self.num_of_ads>60 else self.reward_for_ads
-      #self.reward_for_ads = -self.num_of_ads/3 if self.num_of_ads>60 else self.num_of_ads/4  
-              
+      """      
+      #self.reward_for_ads = -self.num_of_ads/3 if self.num_of_ads>60 else self.num_of_ads/4
+      self.reward_for_ads = (self.num_of_ads)#/(self.num_of_ads+1)
+      #self.reward_for_ads = -self.reward_for_ads if self.num_of_ads>60 else self.reward_for_ads      
+      self.reward_for_ads = -10 if self.num_of_ads>60 else 10
+      """        
       if len(sents)>0:
         break        
 
@@ -380,9 +396,9 @@ class FakeNewsEnv(gym.Env):
 
     #Texto de log
     log = f'\n\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n' + \
-          f'title: {self.title}. Label: {self.label} #ads:{self.num_of_ads}\n' + \
+          f'title: {self.title}. Label: {self.label} \n' + \
           ' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n'
-      
+    
     print(log)
     
     #formar el observation
@@ -411,4 +427,5 @@ class FakeNewsEnv(gym.Env):
  
  
   def close (self):
-    pass
+    if not self.train_mode:
+        self.dataManager.webScrapper.Terminar()

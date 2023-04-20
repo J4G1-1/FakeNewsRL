@@ -37,9 +37,9 @@ class WebScrapper:
     self.driver = webdriver.Firefox(firefox_profile=firefoxProfile)
     
     #tamaño de la ventana
-    self.driver.set_window_size(900,800)
+    self.driver.set_window_size(600,600)
     #Si la página tarda más de 5 segundos, se extrae el html como éste y se sigue
-    self.driver.set_page_load_timeout(6)
+    self.driver.set_page_load_timeout(5)
 
     self.data = ''
 
@@ -96,7 +96,7 @@ class WebScrapper:
         
         def is_not_a_document(url)->bool:
           #return True if the url does not correspond to a text document
-          extensions = [".pdf",".doc", ".docx", ".txt", "csv", ".xls", ".xlsx", ".xlsm" , ".xlsb",]
+          extensions = [".pdf",".doc", ".docx", ".txt", ".csv", ".xls", ".xlsx", ".xlsm" , ".xlsb",]
           for i in extensions:
             if i in url:return False
           return True

@@ -23,5 +23,7 @@ class WebDataManager:
         return self.webScrapper.GotoNextWebPage()
 
     def GetLoadedData(self):
-        return [self.title, self.label, self.webScrapper.GetLoadedData(),
-         self.webScrapper.GetNumAds()]
+        return [self.title, self.label, self.webScrapper.GetLoadedData()]
+    
+    def GetNumAds(self):
+        return self.webScrapper.GetNumAds()
