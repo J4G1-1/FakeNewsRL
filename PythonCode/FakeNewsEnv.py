@@ -375,14 +375,7 @@ class FakeNewsEnv(gym.Env):
       else:
         self.title, self.label, text = self.dataManager.GetLoadedData()
         sents = self.GetSents(text)
-        
-      
-      """      
-      #self.reward_for_ads = -self.num_of_ads/3 if self.num_of_ads>60 else self.num_of_ads/4
-      self.reward_for_ads = (self.num_of_ads)#/(self.num_of_ads+1)
-      #self.reward_for_ads = -self.reward_for_ads if self.num_of_ads>60 else self.reward_for_ads      
-      self.reward_for_ads = -10 if self.num_of_ads>60 else 10
-      """        
+                
       if len(sents)>0:
         break        
 
