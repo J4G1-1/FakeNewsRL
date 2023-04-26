@@ -37,7 +37,7 @@ class FakeNewsEnv(gym.Env):
     self.model_name = model_name
     self.train_mode = train_mode
     self.cantidad_ads = []
-
+    
     #Crear carpetas de logs escritos por el programador
     self.logcustom = "logscustom"
     if not os.path.exists(self.logcustom):
@@ -127,22 +127,22 @@ class FakeNewsEnv(gym.Env):
                                   accumulatedDisagree,
                                   current_sent.vector),
                                   axis=None)
-
+    
     return observation
-
-  #El método toma encuenta los valores producidos por la funcion gaussiana para calcular el reward
+  
+  #El método toma en cuenta los valores producidos por la funcion gaussiana para calcular el reward
   # En pocas palabras el reward funciona de la siguiente manera:
   # Conforme se van agregando elementos al agree o al disagree list, la recompensa por
   # agregar más elementos es menor
   def SimilarityReward(self, simility_list):
     GaussianFactor = 0
     reward = 0
-
+    
     if len(simility_list) >= len(self.GaussianFactorList):
       GaussianFactor = self.GaussianFactorList[len(self.GaussianFactorList)-1]
     else:
       GaussianFactor = self.GaussianFactorList[len(simility_list)]
-
+    
     for simility in simility_list:
       simility_reward = (16*simility - 8)
       reward = GaussianFactor*simility_reward + reward
@@ -153,10 +153,10 @@ class FakeNewsEnv(gym.Env):
   def step(self, action):
 
     self.action_counter[action] = self.action_counter[action] + 1
-
+    
     isFinished = False
     reward = 0
-
+    
     rew_simility = 0
     rew_len = 0
     reward_factor = 0
@@ -165,16 +165,16 @@ class FakeNewsEnv(gym.Env):
     reward_len_disagree = 0
     reward_dates_agreeList = 0
     reward_dates_disagreeList = 0
-
+    
     ##Ignore sent
     if action==0:
       #Pasa a la siguiente sent
       more = self.argumentLists.GoToNextSent()
-
+    
       if more is False:
-        reward = -0.0
+        reward = -0.1
       else:
-        reward = 0.0
+        reward = 0.1
 
 
     ##Add to affirm
@@ -186,7 +186,7 @@ class FakeNewsEnv(gym.Env):
       if more is False:
         reward = -0.0
       else:
-
+    
         simility_list, reward_dates_agreeList = self.argumentLists.append_agree_list(present_sent)
 
         ##Calculo de similitud
@@ -197,7 +197,7 @@ class FakeNewsEnv(gym.Env):
         if self.flags[1] == '1':
           rew_len = self.sigmodialFunction(len(present_sent),7,-1.3,13,-3.5)
 
-        reward = reward + rew_len + rew_simility + reward_dates_agreeList + self.reward_for_ads
+        reward = reward + rew_len + rew_simility + reward_dates_agreeList
         if reward_dates_agreeList!=0:
           self.reward_for_dates[0].append(reward_dates_agreeList)
 
@@ -217,19 +217,19 @@ class FakeNewsEnv(gym.Env):
         ##Calculo de similitud
         if self.flags[0] == '1':
           rew_simility = self.SimilarityReward(simility_list)
-
+    
         ##Calculo de longitud
         if self.flags[1] == '1':
           rew_len = self.sigmodialFunction(len(present_sent),7,-1.3,13,-3.5)
 
-        reward = reward + rew_len + rew_simility + reward_dates_disagreeList + self.reward_for_ads
+        reward = reward + rew_len + rew_simility + reward_dates_disagreeList
         if reward_dates_disagreeList!=0:
           self.reward_for_dates[1].append(reward_dates_disagreeList)
-
-
+    
+    
     ##Go to the next url
     if action==3:
-
+    
       status = self.dataManager.GoNextArticle()
       #obtenemos la cantidad de anuncios dentro del articulo
       self.num_of_ads = self.dataManager.GetNumAds()
@@ -238,18 +238,18 @@ class FakeNewsEnv(gym.Env):
       
       #reward for ads      
       if self.num_of_ads != 0:
-        self.reward_for_ads = 10 if 0<self.num_of_ads<=60 else -10
+        self.reward_for_ads = 18 if 0<self.num_of_ads<=60 else -10
       else:
         self.reward_for_ads = 0
-
+    
       if not status:
         isFinished = True
-
+    
       if self.flags[2] == '1':
         decision = self.argumentLists.GetDecision()
         agreelist = self.argumentLists.getAgreeList()
         disagreelist = self.argumentLists.getDisagreeList()
-
+    
         diff = abs(len(agreelist) - len(disagreelist))
         
         
@@ -258,13 +258,13 @@ class FakeNewsEnv(gym.Env):
         reward_factor = self.sigmodialFunction(diff,3.4,-0.5,4.4,0)
         
         if isFinished:
-
+          
           if decision == -1:
             reward = 0 + reward
             
           elif self.label == decision:
             self.counter_good = self.counter_good + 1
-            reward = reward_factor + reward + self.reward_for_ads
+            reward = reward_factor + reward + abs(self.reward_for_ads)
           else:
             self.counter_wrong = self.counter_wrong + 1
             reward = -reward_factor + reward + self.reward_for_ads
@@ -275,20 +275,20 @@ class FakeNewsEnv(gym.Env):
           if decision == -1:
             reward = 0 + reward
           elif self.label == decision:
-            reward =  reward_factor+ reward
+            reward =  reward_factor+ reward+  abs(self.reward_for_ads)
           else:
-            reward = -reward_factor + reward
-
+            reward = -reward_factor + reward + self.reward_for_ads
+    
       #Reward de pasos
       if self.flags[3] == '1':
         current_step_num = sum(self.action_counter)
         diff_step = current_step_num - self.last_step_three
-
-        reward_diff_step = self.sigmodialFunction(diff_step,19.2,-1.4,24.5,-11.3)
+    
+        reward_diff_step = self.sigmodialFunction(diff_step,19.3,-1.4,24.5,-11.3)
         reward = reward_diff_step + reward
-
+    
         self.last_step_three = current_step_num
-
+    
       #Reward de tamaño
       if self.flags[4] == '1':
         try:#si agreelist y disagreelist existen, entonces
@@ -300,11 +300,11 @@ class FakeNewsEnv(gym.Env):
           reward_len_disagree = self.sigmodialFunction(0,4.5,-0.6,4,-2)
           
       reward = reward_len_agree + reward_len_disagree + reward
-
+    
     observation = self.BuildObservation()
-
+    
     info = {}    
-
+    
     self.total_reward = self.total_reward + reward
     
     if isFinished:
@@ -336,7 +336,6 @@ class FakeNewsEnv(gym.Env):
           f'Reward for dates in agreelist: {reward_dates_agreeList} \n' + \
           f'Reward for dates in disagreelist: {reward_dates_disagreeList} \n' + \
           f'Reward: {reward}, Total: {self.total_reward} \n' + \
-          f'Rewar for ads: {self.reward_for_ads}\n' + \
           f'Current sent: {self.argumentLists.GetCurrentSent()} \n'
           
           
@@ -375,7 +374,7 @@ class FakeNewsEnv(gym.Env):
       else:
         self.title, self.label, text = self.dataManager.GetLoadedData()
         sents = self.GetSents(text)
-                
+        
       if len(sents)>0:
         break        
 
