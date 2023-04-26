@@ -54,8 +54,9 @@ try:
     model_name = sys.argv[3]
 except:
     #entonces se usar uno por default.
-    #brain_version  = 'brain - 04 18 2023, 17 35 48.zip'
-    brain_version  = 'brain - 10 26 2022, 00_55_02.zip'
+    #brain_version = 'brain - 04 18 2023, 17 35 48.zip'
+    #brain_version = 'brain - 10 26 2022, 00_55_02.zip'
+    brain_version = 'brain - 04 26 2023, 00 09 58.zip'
 
 
 local_data_path = "./chunk_0-500"
@@ -157,10 +158,3 @@ for i in env.cantidad_ads:
     file_ads.writelines(str(i)+'\n')
 file_ads.close()
 
-"""
-try:
-    
-    print(env.reward_for_dates[0],'_'*20)
-    print(env.reward_for_dates[1])
-except:pass
-"""
