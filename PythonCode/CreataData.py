@@ -46,7 +46,7 @@ class thread_news(threading.Thread):
             #Si no encuentra ningun resultado reinicia
             if status:
                 sents_list = []
-                
+                number_of_ads = []
                 while True:
                     status = self.webScrapper.GotoNextWebPage()
                     
@@ -56,26 +56,29 @@ class thread_news(threading.Thread):
                     if status == 1:
                         try:
                             text = self.webScrapper.GetLoadedData()
+                            GetNumAds = self.webScrapper.GetNumAds()
                             doc = self.nlp(text)
                             sents = [sentence for sentence in doc.sents]
                             if len(sents)>0:
                                 sents_list.append(text)
+                                number_of_ads.append(GetNumAds)
                         except Exception as e:
                             print("Hubo problemas al parsear el html ", e)
             
-                dict = {'title':title,'label':label,'data':sents_list}
+                dict = {'title':title,'label':label,'data':sents_list, 'no_ads':number_of_ads}
                 self.chunk.append(dict)
+                dict = {}
         print('Termino ',self.thread_ID)
         self.webScrapper.Terminar()
 
 dataFrameNews = pd.read_csv(r"./data/DataFakeNews.csv")
 
-global_begin = 300
-global_end = 600
+global_begin = 0
+global_end = 500
 
 diff = global_end - global_begin
 
-number_thread = 10
+number_thread = 4
 chunk_size = int(diff/number_thread)
 thread_list = []
 

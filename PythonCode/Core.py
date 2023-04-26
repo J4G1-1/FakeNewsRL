@@ -58,7 +58,7 @@ except:
     brain_version  = 'brain - 10 26 2022, 00_55_02.zip'
 
 
-local_data_path = "./../chunk_0-600"
+local_data_path = "./chunk_0-500"
 
 #ruta para localizar el modelo seleccionado
 path = f"./models/{model_name}/{brain_version}"
@@ -94,7 +94,7 @@ except:#se usaria por default la flag "10101"
 
 
 #creacion del ambiente
-env = FakeNewsEnv(flags,False, model_name, local_data_path)
+env = FakeNewsEnv(flags,True, model_name, local_data_path)
 
 #Creación de modelo de RL DQN
 if model_info['name'] == 'PPO':
@@ -124,7 +124,7 @@ elif model_info['name'] == 'A2C':
 
 ##Estos timesteps serán el número de pasos de una evaluación
 ##para hacer un reporte en tensorboard
-TIMESTEPS_PER_EVALUATION = 1
+TIMESTEPS_PER_EVALUATION = 33
 
 
 #Es el numero de evaluación (puntos en tensorboard)
@@ -152,7 +152,7 @@ model.save(f"{models_dir}/brain - {date_time}")
 env.WriteCurrentLog(log_name)
 env.close()
 
-file_ads = open("anuncion.txt",'w')
+file_ads = open("anuncios.txt",'w')
 for i in env.cantidad_ads:
     file_ads.writelines(str(i)+'\n')
 file_ads.close()
