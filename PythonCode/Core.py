@@ -124,7 +124,7 @@ elif model_info['name'] == 'A2C':
 
 ##Estos timesteps serán el número de pasos de una evaluación
 ##para hacer un reporte en tensorboard
-TIMESTEPS_PER_EVALUATION = 33
+TIMESTEPS_PER_EVALUATION = 3200
 
 
 #Es el numero de evaluación (puntos en tensorboard)
