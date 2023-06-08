@@ -30,7 +30,7 @@ Al ejecutar este archivo, se pueden recibir 3 argumentos opcionales.
     # 0: Similitud al insertar
     # 1: Longitud de sent insertado
     # 2: Descision diff
-    # 3: Reward por repetir step
+    # 3: Reward por repetir accion 3
     # 4: Reward por el tamaño de cada lista
 
 
@@ -41,23 +41,17 @@ Al ejecutar este archivo, se pueden recibir 3 argumentos opcionales.
 """
 
 
-
 try:
     # sys.argv[1] in {"PPO", "DQN", "A2C"}
     model_name = sys.argv[1]
 except:
-    #entonces se usar por default, "DQN"
-    model_name = 'DQN'
-
+    #entonces se usar por default, "PPO"
+    model_name = 'PPO'
 
 try:
     model_name = sys.argv[3]
 except:
-    #entonces se usar uno por default.
-    #brain_version = 'brain - 04 25 2023, 22 28 05.zip'
-    #brain_version = 'brain - 10 26 2022, 00_55_02.zip'
-    #brain_version = 'brain - 04 26 2023, 00 09 58.zip'
-    #brain_version = 'brain - 05 03 2023, 15 14 32.zip'
+    #entonces se usar uno por default.    
     brain_version = ''
 
 
@@ -91,15 +85,14 @@ if not os.path.exists(logcustom):
 
 try:
     flags = str(sys.argv[2])
-except:#se usaria por default la flag "10101"
-    #flags = '10100'
-    flags = '10110'
+except:#se usaria por default la flag "11110"    
+    flags = '11110'
 
 
 #creacion del ambiente
 env = FakeNewsEnv(flags, True, model_name, local_data_path)
 
-#Creación de modelo de RL DQN
+#Creación de modelo de RL PPO
 if model_info['name'] == 'PPO':
     try:
         model = PPO.load(model_info['path'],env)
@@ -151,22 +144,9 @@ model.learn(total_timesteps=TIMESTEPS, tb_log_name=log_name)
 
 
 #Guardar el checkpoint del modelo
-#print("saving the model...",f"{models_dir}/brain - {date_time}.zip")
-#model.save(f"{models_dir}/brain - {date_time}")
+print("saving the model...",f"{models_dir}/brain - {date_time}.zip")
+model.save(f"{models_dir}/brain - {date_time}")
 
 env.WriteCurrentLog(log_name)
 env.close()
 
-"""
-file_ads = open("anuncios.txt",'w')
-for i in env.cantidad_ads:
-    file_ads.writelines(str(i)+'\n')
-file_ads.close()
-
-
-try:
-    
-    print(env.reward_for_dates[0],'_'*20)
-    print(env.reward_for_dates[1])
-except:pass
-"""
