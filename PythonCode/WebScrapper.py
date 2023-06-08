@@ -74,7 +74,7 @@ class WebScrapper:
   def DuckDuckSeach(self, phrase):
     return self.GetLinks(phrase,
             'https://duckduckgo.com/',
-            '//h2[@class="LnpumSThxEWMIsDdAT17 CXMyPcQ6nDv47DKFeywM"]/a[@href]',1)
+            '//h2[@class="LnpumSThxEWMIsDdAT17 CXMyPcQ6nDv47DKFeywM"]/a[@href]',4)
   
   #Usando los parametros descritos en los métodos de los navegadores
   # El método GetLinks hace uso del web driver para buscar el query y extraer los url.
