@@ -172,7 +172,7 @@ class WebScrapper:
     try:
       #ubica el boton de "mas resultados" y luego lo pulsa
       #si todo salio bien, return true
-      more_results = self.driver.find_element(By.CLASS_NAME, value='result--more')
+      more_results = self.driver.find_element(By.ID, value='more-results')      
       more_results.click()
       return True
     except:
