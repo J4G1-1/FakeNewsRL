@@ -34,7 +34,10 @@ class WebScrapper:
     firefoxProfile.set_preference("http.response.timeout", 5)
     firefoxProfile.set_preference("dom.max_script_run_time", 5)
 
-    self.driver = webdriver.Firefox(firefox_profile=firefoxProfile, executable_path="/home/j4gh/enviroments/env1/FakeNewsRL-J4G1-1-patch-2/PythonCode/geckodriver")
+    #el archivo geckodriver deberia estar en la carpeta PythonCode
+    #si hay algun error acerca de que no lo encontro, entonces modifique la siguiente linea
+    #poniendo la ruta completa donde se localiza el archivo geckodriver
+    self.driver = webdriver.Firefox(firefox_profile=firefoxProfile, executable_path="./geckodriver")
     
     #tamaño de la ventana
     self.driver.set_window_size(600,600)
