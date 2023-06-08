@@ -38,6 +38,9 @@ vec_env = FakeNewsEnv(flags,train_mode = False,
 brain_path = f"./models/{model_info['model_name']}/{model_info['brain_name']}.zip"
 model = PPO.load(brain_path,vec_env)
 
+"""
+we send the agent to investigate 20 randomly selected news that the agent does not know in advance
+"""
 
 obs = vec_env.reset()
 counter = 0
