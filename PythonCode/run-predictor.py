@@ -1,12 +1,11 @@
 from stable_baselines3 import PPO
 from stable_baselines3 import DQN
 from stable_baselines3 import A2C
-
-
 import os
 from FakeNewsEnv import FakeNewsEnv
-
 from datetime import datetime
+
+#we send the agent to investigate 20 randomly selected news that the agent does not know in advance
 
 model_name = 'PPO'
 
