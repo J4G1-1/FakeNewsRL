@@ -15,7 +15,7 @@ Para su uso se tienen que hacer lo siguiente (En linux, ubuntu):
 3. Para hacer la instalación de los paquetes de python correr: pip install -r requirements.txt
  Se tiene que estar en la carpeta principal
  
-4. Para usarlo en la carpeta main, correr python Core.py (también se puede con python3 ./Core.py)
+4. Para usarlo en la carpeta main, descomprima chunk_0-800-reload.zip y ejecute python Core.py (también se puede con python3 ./Core.py)
 
 5. (opcional) utilice el comando nice, e introduzca el nombre del modelo a usar y la flag deseada (revise Core.py para mas información sobre esto).
 
