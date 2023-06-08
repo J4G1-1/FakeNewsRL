@@ -9,20 +9,9 @@ from FakeNewsEnv import FakeNewsEnv
 from datetime import datetime
 
 model_name = 'PPO'
-#brain_name = 'brain - 03 29 2023, 17 44 59'
-#brain_name = 'brain - 03 29 2023, 19 17 48'
-#brain_name = 'brain - 04 11 2023, 16 23 31'
-#brain_name = 'brain - 04 27 2023, 16 48 10'
-#brain_name = 'brain - 05 03 2023, 15 14 32'
-#brain_name = 'brain - 05 01 2023, 13 18 59'
-#brain_name = 'brain - 05 03 2023, 22 21 48'
 
-#mejor brain
 #brain_name = 'brain - 05 05 2023, 10 07 41'
 brain_name = 'brain - 05 18 2023, 00 24 44'
-
-#2do mejor brain
-#brain_name = 'brain - 05 08 2023, 17 57 19'
 
 brain_checkpoint = 'checkpoint 400000 - 500000'
 brain_replay = 'replay 400000 - 500000'
