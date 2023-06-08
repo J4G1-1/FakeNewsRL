@@ -10,12 +10,10 @@ from datetime import datetime
 
 model_name = 'PPO'
 
-#brain_name = 'brain - 05 05 2023, 10 07 41'
-brain_name = 'brain - 05 18 2023, 00 24 44'
+brain_name = 'brain - 05 20 2023, 00 57 10'
 
 brain_checkpoint = 'checkpoint 400000 - 500000'
 brain_replay = 'replay 400000 - 500000'
-
 
 
 eval_outcome_logs = f"./models/{model_name}/{brain_name}/outcome_logs/eval/"
@@ -23,7 +21,7 @@ eval_outcome_logs = f"./models/{model_name}/{brain_name}/outcome_logs/eval/"
 model_info = {'model_name': model_name,
               'brain_name' : brain_name,
             'brain_checkpoint' : 'checkpoint 400 - 500',
-            'flags' : "00100",
+            'flags' : "11110",
             'brain_replay' : 'replay 400 - 500',
             'eval_outcome_logs' : eval_outcome_logs}
 
@@ -41,12 +39,6 @@ brain_path = f"./models/{model_info['model_name']}/{model_info['brain_name']}.zi
 model = PPO.load(brain_path,vec_env)
 
 
-"""
-replay_path = f"./models/{model_info['model_name']}/{model_info['brain_name']}/{model_info['brain_replay']}.pkl"
-model.load_replay_buffer(replay_path)
-"""
-
-
 obs = vec_env.reset()
 counter = 0
 
@@ -58,7 +50,7 @@ while True:
         counter = counter + 1
         vec_env.reset()
 
-    if counter == 40:
+    if counter == 20:
         break
 
 #fecha de la creacion del modelo
