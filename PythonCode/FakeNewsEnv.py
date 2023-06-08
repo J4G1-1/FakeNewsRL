@@ -76,9 +76,8 @@ class FakeNewsEnv(gym.Env):
     if self.train_mode:
       self.dataManager = LocalDataManager(localdata_path=self.local_data_path)      
     else:
-      #self.dataManager = WebDataManager(r"./data/DataFakeNews.csv")
       self.dataManager = WebDataManager(self.local_data_path)
-      #self.dataManager = WebDataManager(r"./data/noti.csv")
+      
       
 
     #Creacion de la estrucutra de datos de listas
