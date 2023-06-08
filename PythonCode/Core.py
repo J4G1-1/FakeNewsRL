@@ -51,7 +51,7 @@ except:
 try:
     model_name = sys.argv[3]
 except:
-    #entonces se usar uno por default.    
+    #entonces se crea uno por default.    
     brain_version = ''
 
 
