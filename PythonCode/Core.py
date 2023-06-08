@@ -54,12 +54,14 @@ try:
     model_name = sys.argv[3]
 except:
     #entonces se usar uno por default.
-    #brain_version = 'brain - 04 18 2023, 17 35 48.zip'
+    #brain_version = 'brain - 04 25 2023, 22 28 05.zip'
     #brain_version = 'brain - 10 26 2022, 00_55_02.zip'
-    brain_version = 'brain - 04 26 2023, 00 09 58.zip'
+    #brain_version = 'brain - 04 26 2023, 00 09 58.zip'
+    #brain_version = 'brain - 05 03 2023, 15 14 32.zip'
+    brain_version = ''
 
 
-local_data_path = "./chunk_0-500"
+local_data_path = "./chunk_0-800-reload"
 
 #ruta para localizar el modelo seleccionado
 path = f"./models/{model_name}/{brain_version}"
@@ -90,12 +92,12 @@ if not os.path.exists(logcustom):
 try:
     flags = str(sys.argv[2])
 except:#se usaria por default la flag "10101"
-    #flags = '10101'
-    flags = '10111'
+    #flags = '10100'
+    flags = '10110'
 
 
 #creacion del ambiente
-env = FakeNewsEnv(flags,True, model_name, local_data_path)
+env = FakeNewsEnv(flags, True, model_name, local_data_path)
 
 #Creación de modelo de RL DQN
 if model_info['name'] == 'PPO':
@@ -125,7 +127,8 @@ elif model_info['name'] == 'A2C':
 
 ##Estos timesteps serán el número de pasos de una evaluación
 ##para hacer un reporte en tensorboard
-TIMESTEPS_PER_EVALUATION = 3200
+#TIMESTEPS_PER_EVALUATION = 5000
+TIMESTEPS_PER_EVALUATION = 5000
 
 
 #Es el numero de evaluación (puntos en tensorboard)
@@ -140,21 +143,30 @@ TIMESTEPS = TIMESTEPS_PER_EVALUATION * NUMBER_OF_EVALUATIONS
 now = datetime.now() # current date and time
 date_time = now.strftime("%m %d %Y, %H %M %S")
 
-input('Presiona enter para iniciar:')
+#input('Presiona enter para iniciar:')
 
 #Comenzar el entrenamiento del modelo 
 log_name = f'{model_name} - {date_time} - {flags}'
 model.learn(total_timesteps=TIMESTEPS, tb_log_name=log_name)
 
+
 #Guardar el checkpoint del modelo
-print("saving the model...",f"{models_dir}/brain - {date_time}.zip")
-model.save(f"{models_dir}/brain - {date_time}")
+#print("saving the model...",f"{models_dir}/brain - {date_time}.zip")
+#model.save(f"{models_dir}/brain - {date_time}")
 
 env.WriteCurrentLog(log_name)
 env.close()
 
+"""
 file_ads = open("anuncios.txt",'w')
 for i in env.cantidad_ads:
     file_ads.writelines(str(i)+'\n')
 file_ads.close()
 
+
+try:
+    
+    print(env.reward_for_dates[0],'_'*20)
+    print(env.reward_for_dates[1])
+except:pass
+"""

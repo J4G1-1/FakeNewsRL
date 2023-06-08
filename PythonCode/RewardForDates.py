@@ -35,16 +35,23 @@ def similarity_dates(list_dates, nlp):
     sim = []    
     
     for i in list_dates:
+        if len(list_dates)==1:
+            return 0
+
         d1 = nlp(i[0])
         d2 = nlp(i[1])
-        simi = d1.similarity(d2)
-        if simi<0.5:
+        if len(d1) not in [0,1] and len(d2) not in [0,1]:
+            simi = d1.similarity(d2)
+        else:
+            simi = 0
+
+        if simi<0.40:
             sim.append(-simi)
             #print(i,' - ',-simi)
         else:
             sim.append(simi)
             #print(i,' - ',simi)
-    return sum(sim)
+    return sum(sim)*len(list_dates)
 
    
 

@@ -40,8 +40,8 @@ class ArgumentList:
     self.dates_disagree = []
 
   #Carga un nuevo conjunto de sents para su analisis.
-  def ChargeSents(self,sent_list):
-    self.sent_list = sent_list
+  def ChargeSents(self, sent_list):
+    self.sent_list = list(set(sent_list))
     self.sent_index = 0
     self.current_sent = self.sent_list[0]
     
@@ -177,8 +177,23 @@ class ArgumentList:
       elif disagree_count > agree_count:
         return 0
       else:
-        return -1
-  
+          return self.ReValDecision1()
+
+  def ReValDecision2(self, ads_reward_list):
+      #Este metodo es para revaluar una desicion tomada
+      #se usara este metodo cuando el GetDecision retorne -1
+      vote = sum(ads_reward_list)/len(ads_reward_list)
+      if vote <=60:
+          return 1
+      else:
+          return 0
+  def ReValDecision1(self):
+      s1, s2 = 0, 0
+      for i in self.agreelist:s1+=len(i)
+      for i in self.disagreelist:s2+=len(i)
+      if s1> s2:return 1
+      else:return 0
+
   def getAgreeList(self):
     return [sent.text + "\n" for sent in self.agreelist]
 

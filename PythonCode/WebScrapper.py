@@ -34,7 +34,7 @@ class WebScrapper:
     firefoxProfile.set_preference("http.response.timeout", 5)
     firefoxProfile.set_preference("dom.max_script_run_time", 5)
 
-    self.driver = webdriver.Firefox(firefox_profile=firefoxProfile)
+    self.driver = webdriver.Firefox(firefox_profile=firefoxProfile, executable_path="/home/j4gh/enviroments/env1/FakeNewsRL-J4G1-1-patch-2/PythonCode/geckodriver")
     
     #tamaño de la ventana
     self.driver.set_window_size(600,600)
@@ -44,18 +44,18 @@ class WebScrapper:
     self.data = ''
 
   #El método busca en internet el string phrase y guarda los url devueltos.
-  #TODO: El método actualmente usa duckduck, sin embargo con la estrucutra
+  #TODO: El método actualmente usa DuckDuckGo, sin embargo con la estrucutra
   #hecha se puede usar google si el debido método es llamado. Por lo tanto,
   # se podría mejorar si da la opción de escoger el buscador a usar. Aparte
   # implementar otros navegadores como yahoo, bing, etc.
-  def ChargeFromWeb(self, phrase):
+  def ChargeFromWeb(self, phrase,):
     self.urls_index = 0
     self.urls = self.DuckDuckSeach(phrase)
 
     if len(self.urls) == 0:
-        return False
+      return False
     else:
-        return True
+      return True
   
   #Los siguiente métodos sirven para usar diferentes navegadores para buscar
   #el query solicitado. Por lo tanto, cada método implementa un navegador diferente.
@@ -66,17 +66,17 @@ class WebScrapper:
   def GoogleSearch(self, phrase):
     return self.GetLinks(phrase,
                 'https://www.google.com/',
-                '//div[@class="yuRUbf"]/a[@href]')
+                '//div[@class="yuRUbf"]/a[@href]', 0)
 
   def DuckDuckSeach(self, phrase):
     return self.GetLinks(phrase,
             'https://duckduckgo.com/',
-            '//h2[@class="LnpumSThxEWMIsDdAT17 CXMyPcQ6nDv47DKFeywM"]/a[@href]')
+            '//h2[@class="LnpumSThxEWMIsDdAT17 CXMyPcQ6nDv47DKFeywM"]/a[@href]',1)
   
-  # Usando los parametros desctiros en los métodos de los navegadores
+  #Usando los parametros descritos en los métodos de los navegadores
   # El método GetLinks hace uso del web driver para buscar el query y extraer los url.
-  # Adicionalmente cambia el orden en como los links fueron encontrados para evitar patrones.
-  def GetLinks(self, phrase ,enginelink, xpath):
+  #Adicionalmente cambia el orden en como los links fueron encontrados para evitar patrones.
+  def GetLinks(self, phrase ,enginelink, xpath, pagination=0, ):
 
     try:
         self.driver.get(enginelink)
@@ -86,7 +86,13 @@ class WebScrapper:
         search.send_keys(phrase)
         search.send_keys(Keys.RETURN)
 
-        time.sleep(2)
+        time.sleep(3)
+
+        #pagination: cantidad de veces que se pulsara en el boton "Mas resultados" en la busqueda de DuckDuckGo
+        #antes de guardar los url devueltos.
+        for i in range(0, pagination):
+          if self.LMRF_DuckDuck():pass
+          else:break
 
         ## Get the urls of all the results of the current page of the search's results
         webpages = self.driver.find_elements(by=By.XPATH, value = xpath)
@@ -140,7 +146,7 @@ class WebScrapper:
       soup = BeautifulSoup(innerHtml, "html.parser")
       html_text = soup.get_text()
       html_text = re.sub('(?<=\n)\s+\n', '', html_text)
-      html_text = re.sub('\n', '.', html_text)
+      #html_text = re.sub('\n', '.', html_text)
       html_text = re.sub('\s{2,}', '.', html_text)
       html_text = re.sub('\[\d+]', '', html_text)
       self.data = re.sub('\|+|\/+|-+', '', html_text)
@@ -160,6 +166,18 @@ class WebScrapper:
     
   def GetNumAds(self):
     return self.number_of_ads
+
+  def LMRF_DuckDuck(self):
+    #load more results for any news searched on DuckDuckGo
+    try:
+      #ubica el boton de "mas resultados" y luego lo pulsa
+      #si todo salio bien, return true
+      more_results = self.driver.find_element(By.CLASS_NAME, value='result--more')
+      more_results.click()
+      return True
+    except:
+      return False
+
 
   def Terminar(self):
     self.driver.quit()

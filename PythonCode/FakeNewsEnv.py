@@ -36,8 +36,13 @@ class FakeNewsEnv(gym.Env):
     self.flags = flags
     self.model_name = model_name
     self.train_mode = train_mode
-    self.cantidad_ads = []
+    self.local_data_path = local_data_path
     
+    #en esta lista se guardaran diccionarios con la cantidad de anuncios encotrados
+    #en cada articulo que se analizo al momento de investigar una noticia
+    #los elementos tendran el siguiente formato: {"titulo de la noticia":[x0, x1, x2, ...]}
+    self.cantidad_ads = [{}]
+    self.reward_for_ads = 0
     #Crear carpetas de logs escritos por el programador
     self.logcustom = "logscustom"
     if not os.path.exists(self.logcustom):
@@ -69,9 +74,10 @@ class FakeNewsEnv(gym.Env):
 
     #Creacion del dirver para webscrapping
     if self.train_mode:
-      self.dataManager = LocalDataManager(localdata_path=local_data_path)
+      self.dataManager = LocalDataManager(localdata_path=self.local_data_path)      
     else:
-      self.dataManager = WebDataManager(r"./data/DataFakeNews.csv")
+      #self.dataManager = WebDataManager(r"./data/DataFakeNews.csv")
+      self.dataManager = WebDataManager(self.local_data_path)
       #self.dataManager = WebDataManager(r"./data/noti.csv")
       
 
@@ -111,7 +117,10 @@ class FakeNewsEnv(gym.Env):
   def GetSents(self, text):
     try:
       doc = self.nlp(text)
-      return [sentence for sentence in doc.sents]
+      get_sents = [sentence for sentence in doc.sents if len(str(sentence))>2]
+      #eliminamos las sentences repetidas
+      get_sents = list(set(get_sents))
+      return get_sents
     except:
       print("Hubo problemas al parsear el html")
       return []
@@ -144,9 +153,21 @@ class FakeNewsEnv(gym.Env):
       GaussianFactor = self.GaussianFactorList[len(simility_list)]
     
     for simility in simility_list:
-      simility_reward = (16*simility - 8)
-      reward = GaussianFactor*simility_reward + reward
-    
+      simility_reward = (18*simility - 8)
+      reward += GaussianFactor*simility_reward
+
+    #introducimos un sesgo positivo que aumenta la recompensa cuando
+    #la similitud es >-3
+    self.num_of_ads = self.dataManager.GetNumAds()
+    self.reward_for_ads = 15 if 0<self.num_of_ads<=60 else -5
+    #if(0>reward>-3):
+    #  reward += abs(self.reward_for_ads)*.4
+    if 10>reward>=2:
+      reward += abs(self.reward_for_ads)*.7
+    elif reward>=10:
+      reward += abs(self.reward_for_ads)
+    else:
+      reward += 0.5
     return reward
 
 
@@ -170,21 +191,26 @@ class FakeNewsEnv(gym.Env):
     if action==0:
       #Pasa a la siguiente sent
       more = self.argumentLists.GoToNextSent()
+      self.reward_for_ads = 0
     
       if more is False:
-        reward = -0.1
+        reward = -0.01
+        action = 3 #obligamos al agente a pasar al sig. articulo
       else:
-        reward = 0.1
+        reward = -0.1
 
 
     ##Add to affirm
     if action==1:
+      reward = 0  
+      self.reward_for_ads = 0
       present_sent = self.argumentLists.GetCurrentSent()
 
       more = self.argumentLists.GoToNextSent()
       #Si ya no hay sents se da una rencompensa negativa
       if more is False:
         reward = -0.0
+        action = 3#obligamos a que el agente vaya al siguiente articulo
       else:
     
         simility_list, reward_dates_agreeList = self.argumentLists.append_agree_list(present_sent)
@@ -195,14 +221,16 @@ class FakeNewsEnv(gym.Env):
 
         ##Calculo de longitud
         if self.flags[1] == '1':
-          rew_len = self.sigmodialFunction(len(present_sent),7,-1.3,13,-3.5)
+          rew_len = self.sigmodialFunction(len(str(present_sent)),13,-1.2,7,-7)
 
-        reward = reward + rew_len + rew_simility + reward_dates_agreeList
+        reward += rew_len + rew_simility + reward_dates_agreeList
         if reward_dates_agreeList!=0:
           self.reward_for_dates[0].append(reward_dates_agreeList)
 
     ##Add to objection
     if action==2:
+      reward = 0
+      self.reward_for_ads = 0  
       ##Calculo de similitud
       present_sent = self.argumentLists.GetCurrentSent()
 
@@ -210,6 +238,7 @@ class FakeNewsEnv(gym.Env):
       #Si ya no hay sents se da una rencompensa negativa
       if more is False:
         reward = -0.0
+        action = 3#obligamos a que el agente vaya al siguiente articulo
       else:
         
         simility_list, reward_dates_disagreeList = self.argumentLists.append_disagree_list(present_sent)
@@ -220,27 +249,29 @@ class FakeNewsEnv(gym.Env):
     
         ##Calculo de longitud
         if self.flags[1] == '1':
-          rew_len = self.sigmodialFunction(len(present_sent),7,-1.3,13,-3.5)
+          rew_len = self.sigmodialFunction(len(str(present_sent)),13,-1.2,7,-7)
+          #rew_len = self.sigmodialFunction(len(present_sent),7,-1.3,13,-3.5)
 
-        reward = reward + rew_len + rew_simility + reward_dates_disagreeList
+        reward += rew_len + rew_simility + reward_dates_disagreeList
         if reward_dates_disagreeList!=0:
           self.reward_for_dates[1].append(reward_dates_disagreeList)
     
     
     ##Go to the next url
     if action==3:
-    
+      reward = 0      
       status = self.dataManager.GoNextArticle()
       #obtenemos la cantidad de anuncios dentro del articulo
       self.num_of_ads = self.dataManager.GetNumAds()
-      
-      self.cantidad_ads.append({self.title:self.num_of_ads})
-      
-      #reward for ads      
-      if self.num_of_ads != 0:
-        self.reward_for_ads = 18 if 0<self.num_of_ads<=60 else -10
+      if self.cantidad_ads[-1] == {}:
+        self.cantidad_ads[-1] = {self.title:[self.num_of_ads, ]}
       else:
-        self.reward_for_ads = 0
+        #guardamos el titulo de la noticia y la cantidad de anuncios encontrados en cada
+        #articulo consultado.
+        self.cantidad_ads[-1][self.title].append(self.num_of_ads)
+        
+      #reward for ads      
+      self.reward_for_ads = 18 if 0<self.num_of_ads<=60 else -10
     
       if not status:
         isFinished = True
@@ -255,51 +286,54 @@ class FakeNewsEnv(gym.Env):
         
         
         #Difference in list reward
-        reward_factor = self.sigmodialFunction(diff,3.4,-0.5,4.4,0)
+        reward_factor = self.sigmodialFunction(diff,20,-0.9,4.3,-12)
         
         if isFinished:
           
-          if decision == -1:
-            reward = 0 + reward
-            
-          elif self.label == decision:
-            self.counter_good = self.counter_good + 1
-            reward = reward_factor + reward + abs(self.reward_for_ads)
-          else:
-            self.counter_wrong = self.counter_wrong + 1
-            reward = -reward_factor + reward + self.reward_for_ads
+            if self.label == decision:
+              self.counter_good = self.counter_good + 1
+              reward = abs(reward_factor) + reward
+            else:
+              self.counter_wrong = self.counter_wrong + 1
+              reward = -abs(reward_factor) + reward
         
         else:
-          
-          reward_factor = (0.05)*reward_factor
-          if decision == -1:
-            reward = 0 + reward
-          elif self.label == decision:
-            reward =  reward_factor+ reward+  abs(self.reward_for_ads)
+          #reward_factor = (0.5)*reward_factor
+          if decision == self.label or self.label == -1:
+            reward += reward_factor + self.reward_for_ads*0.6
           else:
-            reward = -reward_factor + reward + self.reward_for_ads
+            reward += -abs(reward_factor)*1.3 -abs(self.reward_for_ads)*0.8
     
       #Reward de pasos
       if self.flags[3] == '1':
         current_step_num = sum(self.action_counter)
         diff_step = current_step_num - self.last_step_three
     
-        reward_diff_step = self.sigmodialFunction(diff_step,19.3,-1.4,24.5,-11.3)
-        reward = reward_diff_step + reward
+        reward_diff_step = self.sigmodialFunction(diff_step,24,-1.1,6,-15)
+    
+        reward += reward_diff_step
     
         self.last_step_three = current_step_num
     
       #Reward de tamaño
       if self.flags[4] == '1':
         try:#si agreelist y disagreelist existen, entonces
-          reward_len_agree = self.sigmodialFunction(len(agreelist),4.5,-0.6,4,-2)
-          reward_len_disagree = self.sigmodialFunction(len(disagreelist),4.5,-0.6,4,-2)
-          
+          reward_len_agree = self.sigmodialFunction(len(agreelist),17,-0.9,2.7,-14)
+          reward_len_disagree = self.sigmodialFunction(len(disagreelist),17,-.09,2.7,-14)
+          #reward_len_agree = 4 if len(agreelist)>2 else -10
+          #reward_len_disagree = 4 if len(disagreelist)>=2 else -10
         except:
-          reward_len_agree = self.sigmodialFunction(0,4.5,-0.6,4,-2)
-          reward_len_disagree = self.sigmodialFunction(0,4.5,-0.6,4,-2)
-          
-      reward = reward_len_agree + reward_len_disagree + reward
+          reward_len_agree = -13
+          reward_len_disagree = -13                       
+        reward += reward_len_agree + reward_len_disagree
+      if self.flags[4] == '0':
+          #castigamos al agente para que no deje vacia la disagreelist
+          #y lo incentivamos a que no la deje vacia
+          reward += abs(self.reward_for_ads) if 3>len(disagreelist)>0 else 0 if len(disagreelist)>3 else -10
+          reward += abs(self.reward_for_ads) if 4>len(agreelist)>1 else 0 if len(disagreelist)>4 else -10
+      
+      if reward_diff_step >= 6 and reward_factor>=4.5:
+           reward += reward_diff_step*0.5 + reward_factor*0.6 + abs(self.reward_for_ads)*1.5
     
     observation = self.BuildObservation()
     
@@ -335,6 +369,7 @@ class FakeNewsEnv(gym.Env):
           f'reward_len_disagree: {reward_len_disagree} \n' + \
           f'Reward for dates in agreelist: {reward_dates_agreeList} \n' + \
           f'Reward for dates in disagreelist: {reward_dates_disagreeList} \n' + \
+          f'reward for ads: {self.reward_for_ads} \n' + \
           f'Reward: {reward}, Total: {self.total_reward} \n' + \
           f'Current sent: {self.argumentLists.GetCurrentSent()} \n'
           
@@ -356,6 +391,10 @@ class FakeNewsEnv(gym.Env):
     #Si no encuentra ningun resultado reinicia
     if not status:
       return self.reset()
+
+    #agregamos una diccionario vacio que posteriormente sera remplazado
+    #cuando el agente tome por primera vez la accion 3
+    self.cantidad_ads.append({})
 
     ##Loop que revisa si del html se obtuvieron sents
     while True:

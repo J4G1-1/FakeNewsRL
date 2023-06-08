@@ -20,7 +20,8 @@ class LocalDataManager:
         self.title = current_data_dict['title']
         self.label = current_data_dict['label']
         self.datalist = current_data_dict['data']
-        self.ads_counted = current_data_dict['no_ads']
+        self.ads_counted = current_data_dict['#ads']
+        #self.ads_counted = current_data_dict['no_ads']
         self.data_count = 0
         self.current_data = self.datalist[self.data_count]
         self.number_of_ads = self.ads_counted[self.data_count]
