@@ -16,10 +16,10 @@ Para su uso se tienen que hacer lo siguiente (En linux, ubuntu):
  Se tiene que estar en la carpeta principal
  
 4. Para usarlo, primero en la carpeta PythonCode debe descomprimir chunk_0-800-reload.zip
-   4.1 Para usarlo en modo entrenamiento: ejecute python Core.py (también se puede con python3 ./Core.py)
-   4.2 Para usarlo en modo prediccion: ejecute python run-predictor.py (también se puede con python3 ./run-predictor.py)
+5. Para usarlo en modo entrenamiento: ejecute python Core.py (también se puede con python3 ./Core.py)
+6. Para usarlo en modo prediccion: ejecute python run-predictor.py (también se puede con python3 ./run-predictor.py)
 
-5. (opcional) utilice el comando nice, e introduzca el nombre del modelo a usar y la flag deseada (revise Core.py para mas información sobre esto).
+7. (opcional) utilice el comando nice, e introduzca el nombre del modelo a usar y la flag deseada (revise Core.py para mas información sobre esto).
 
 Comando de ejemplo: nice python3 ./Core.py PPO 11101
 
